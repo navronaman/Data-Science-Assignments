@@ -15,6 +15,7 @@ summary(books)
 books$average_rating <- as.numeric(books$average_rating)
 books$isbn <- as.numeric(books$isbn)
 books$isbn13 <- as.numeric(books$isbn13)
+books$num_pages <- as.numeric(books$num_pages)
 books$publication_year <- as.numeric(substr(books$publication_date, nchar(books$publication_date) - 3, nchar(books$publication_date)))
 books <- books[!is.na(books$publication_year), ]
 books <- books[books$publication_year>1000, ]
@@ -58,7 +59,12 @@ books_top <- books[books$publisher=="Penguin Books" |
                    books$publisher=="Vintage", ]
 
 summary(books_top)
-
+tapply(books_top$average_rating, books_top$publisher, mean)
+barplot(tapply(books_top$average_rating, books_top$publisher, mean), 
+        xlab = "Top Publishers",
+        ylab = "Mean Ratings", 
+        main = "Mean Ratings of Top Publishers",
+        col = colors)
 
 
 # HaperCollins Publishers = 48
@@ -91,12 +97,101 @@ z_test_from_data(books, "publication_decade", "average_rating", "2000s", "1950s"
 
 
 
-books[books$authors=="Agatha Christie", ]
-books[books$authors=="Roald Dahl", ]
+# Null Hypothesis - There is no mean difference between the Phalanu and Dhimkhanu Publisher
+# Alternate - Phalanu Publisher has higher mean rating that Dhimkanu Publisher
+
+#
+# books_s <- books[grepl("Agatha Christie|Roald Dahl", books$authors, ignore.case = TRUE), ]
+# tapply(books_s$average_rating, books_s$authors, mean)
+
+# z_test_from_data(books_s, "authors", "average_rating", "Agatha Christie", "Roald Dahl")
 
 
-books_s <- books[grepl("Agatha Christie|Roald Dahl", books$authors, ignore.case = TRUE), ]
-tapply(books_s$average_rating, books_s$authors, mean)
+# Chi Square Test between Ratings and Ratings Count
+contingency_table <- table(books$authors, books$ratings_range)
+contingency_table
+chisq.test(contingency_table)
 
-z_test_from_data(books_s, "authors", "average_rating", "Agatha Christie", "Roald Dahl")
+
+
+
+books_odd = books[books$authors == "Roald Dahl" | 
+                  books$authors == "J.K. Rowling" | 
+                  books$authors == "Agatha Christie" | 
+                  books$authors == "Enid Blyton", ]
+
+# let's create a table for us to do bayesian odds in
+
+table(books_odd$ratings_range, books_odd$authors)
+
+# Observation - JK Rowling is the author
+# Belief - JK Rowling's books have a rating of 4 or higher
+
+# Number of rows that have a rating of 4 or higher
+nf <- nrow(books_odd[books_odd$ratings_range == 5, ])
+nf
+
+n <- nrow(books_odd)
+n
+
+Prior <- nf/n
+Prior
+
+PriorOdds <- Prior/(1-Prior)
+PriorOdds
+
+TruePositive <- (nrow(books_odd[books_odd$authors=="J.K. Rowling" & books_odd$ratings_range==5, ]))/(nrow(books_odd[books_odd$authors=="J.K. Rowling", ]))
+TruePositive <- round(TruePositive, 2)
+TruePositive
+
+FalsePositive <- (nrow(books_odd[books_odd$authors=="J.K. Rowling" & books_odd$ratings_range!= 5, ]))/(nrow(books_odd[books_odd$authors!="J. K. Rowling", ]))
+FalsePositive <- round(FalsePositive, 2)
+FalsePositive
+
+LikelihoodRatio <- TruePositive/FalsePositive
+LikelihoodRatio
+
+PosteriorOdds <- LikelihoodRatio * PriorOdds
+PosteriorOdds
+
+Posterior <- PosteriorOdds/(1+Posterior)
+Posterior
+
+# Observation - The book has a rating of 4 or higher
+# Belief - The book is written by Agatha Christie
+
+# Number of rows that have a rating of 4 or higher
+nf <- nrow(books_odd[books_odd$authors == "Agatha Christie", ])
+nf
+
+n <- nrow(books_odd)
+n
+
+Prior <- nf/n
+Prior
+
+PriorOdds <- Prior/(1-Prior)
+PriorOdds
+
+TruePositive <- (nrow(books_odd[books_odd$authors=="Agatha Christie" & books_odd$ratings_range==5, ]))/(nrow(books_odd[books_odd$range==5, ]))
+TruePositive <- round(TruePositive, 2)
+TruePositive
+
+FalsePositive <- (nrow(books_odd[books_odd$authors!="Agatha Christie" & books_odd$ratings_range== 5, ]))/(nrow(books_odd[books_odd$range!=5, ]))
+FalsePositive <- round(FalsePositive, 2)
+FalsePositive
+
+LikelihoodRatio <- TruePositive/FalsePositive
+LikelihoodRatio
+
+PosteriorOdds <- LikelihoodRatio * PriorOdds
+PosteriorOdds
+
+Posterior <- PosteriorOdds/(1+Posterior)
+Posterior
+
+summary(books_odd)
+summary(books_odd$ratings_count)
+summary(books_odd$num_pages)
+table(books_odd$authors, books_odd$ratings_count)
 
