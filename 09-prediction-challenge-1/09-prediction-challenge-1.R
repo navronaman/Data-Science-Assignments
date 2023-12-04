@@ -139,6 +139,11 @@ mosaicplot(movies_tr[movies_tr$Content=="R", ]$Genre~movies_tr[movies_tr$Content
 # DRAMA R rated movies tend to be GREAT AF
 # Action R and Comedy R and Documentary R are average-er
 
+interesting_data = movies_tr[movies_tr$Genre=="Drama" & movies_tr$Content=="R", ]
+boxplot(Audience~RATING, data=interesting_data, xlab="Rating", ylab="Audience", main="Boxplot of Audience vs Rating for Int Data", col=c("khaki", "cyan"))
+boxplot(Income~RATING, data=movies_tr, xlab="Rating", ylab="Income", main="Boxplot of Audience vs Rating", col=c("khaki", "cyan"))
+
+
 mosaicplot(movies_tr[movies_tr$Content=="PG13", ]$Genre~movies_tr[movies_tr$Content=="PG13", ]$RATING, xlab="Genre", ylab="Rating", main="Mosaic of RATING and Content Rating", col=colors)
 # PG13 tends to be avergae
 # comedy pg13 is great-ish, same for docu PG13
@@ -172,8 +177,6 @@ rpart.plot(tree)
 pred <- predict(tree, movies_tr, type="class")
 head(pred)
 mean(movies_tr$RATING==pred) # 92.40
-
-# 75 on testing
 
 
 summary(movies_tr$Income)
@@ -217,5 +220,43 @@ pred4 <- predict(tree4, movies_tr, type = "class")
 head(pred4) 
 mean(movies_tr$RATING==pred4) # 94.3
 
-# 76.89, 6/10 if you just use rpart
-# 76.9, 6/10 if you use rpart with cp of 0.00005
+# will avoid rpart due to overfitting of data
+
+
+# let's try something new
+plot(movies_tr$Income, movies_tr$Audience, main="Correlation between audience and income", xlab="Income", ylab="Audience", col=colors_vector)
+
+plot(movies_tr[movies_tr$RATING=="Great", ]$Income, movies_tr[movies_tr$RATING=="Great", ]$Audience, main="Correlation between audience and income for great movies", xlab="Income", ylab="Audience", col=colors_vector)
+
+plot(movies_tr[movies_tr$RATING=="Average", ]$Income, movies_tr[movies_tr$RATING=="Average", ]$Audience, main="Correlation between audience and income for average movies", xlab="Income", ylab="Audience", col=colors_vector)
+
+# average movies tend to have a higher audience, with an income that's increasing
+# great movies have a high income, with an audience that is increasing
+# there are many outliers, but let's create another variable
+
+movies_tr$AudienceMinusIncome = movies_tr$Audience - movies_tr$Income
+movies_tr$IncomeMinusAudience = movies_tr$Income - movies_tr$Audience
+
+movies_te$AudienceMinusIncome = movies_te$Audience - movies_te$Income
+movies_te$IncomeMinusAudience = movies_te$Income - movies_te$Audience
+
+plot(movies_tr$Income, movies_tr$IncomeMinusAudience, main="Correlation between income and (income-audience)", xlab="Income", ylab="Audience", col=colors_vector)
+plot(movies_tr[movies_tr$RATING=="Great", ]$Income, movies_tr[movies_tr$RATING=="Great", ]$IncomeMinusAudience, main="Correlation between income and (income and audience) for great movies", xlab="Income", ylab="(IncomeMinuseAudience)", col=colors_vector)
+plot(movies_tr[movies_tr$RATING=="Average", ]$Income, movies_tr[movies_tr$RATING=="Average", ]$IncomeMinusAudience, main="Correlation between income and (income and audience) for average movies", xlab="Income", ylab="(IncomeMinusAudience)", col=colors_vector)
+
+plot(movies_tr$IncomeMinusAudience, movies_tr$Income, main="Correlation between income and (income-audience)", ylab="Income", xlab="Audience", col=colors_vector)
+plot(movies_tr[movies_tr$RATING=="Great", ]$IncomeMinusAudience, movies_tr[movies_tr$RATING=="Great", ]$Income, main="Correlation between income and (income and audience) for great movies", ylab="Income", xlab="(IncomeMinuseAudience)", col=colors_vector)
+plot(movies_tr[movies_tr$RATING=="Average", ]$IncomeMinusAudience, movies_tr[movies_tr$RATING=="Average", ]$Income, main="Correlation between income and (income and audience) for average movies", ylab="Income", xlab="(IncomeMinusAudience)", col=colors_vector)
+
+plot(movies_tr$AudienceMinusIncome, movies_tr$Audience, main="Correlation between income and (audience-income)", ylab="Audience", xlab="AudienceMinusIncome", col=colors_vector)
+plot(movies_tr[movies_tr$RATING=="Great", ]$AudienceMinusIncome, movies_tr[movies_tr$RATING=="Great", ]$Audience, main="Correlation between audience and (audience-income) for great movies", ylab="Audience", xlab="(AudienceMinusIncome)", col=colors_vector)
+plot(movies_tr[movies_tr$RATING=="Average", ]$AudienceMinusIncome, movies_tr[movies_tr$RATING=="Average", ]$Audience, main="Correlation between audience and (audience-income) for average movies", ylab="Audience", xlab="(AudienceMinusIncome)", col=colors_vector)
+
+
+
+tree5 <- rpart(RATING ~ Genre+Content+Audience+Income+AudienceMinusIncome, data = movies_tr, method = "class")
+tree5
+rpart.plot(tree5)
+pred <- predict(tree5, movies_tr, type="class")
+head(pred)
+mean(movies_tr$RATING==pred)
