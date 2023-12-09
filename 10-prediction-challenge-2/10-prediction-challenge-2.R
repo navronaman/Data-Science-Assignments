@@ -7,6 +7,8 @@ income_te <- read.csv('https://raw.githubusercontent.com/paramshah4/data101_tuto
 income_tr$CollegeLocation <- income_tr$College_location
 income_tr$SquareLi <- income_tr$LinkedIN ^ 2
 
+unique(income_tr$Major)
+
 # Color Vectors
 colors <- c("violet", "darkblue", "lightblue", "darkgreen", "lightgreen","yellow", "darkred", "cyan","orange", "pink", "grey", "beige","brown")
 
@@ -32,6 +34,9 @@ plot(income_tr$LinkedIN^2, income_tr$Salary, main="Linkedin and Salary", xlab="L
 
 # Let's see for each indivisual major
 
+plot(income_tr[income_tr$Major=="Other", ]$SquareLi, income_tr[income_tr$Major=="Other", ]$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
+
+
 # Business
 income_tr_bus <- income_tr[income_tr$Major=="Buisness", ]
 
@@ -51,7 +56,23 @@ income_tr_stem <- income_tr[income_tr$Major=="STEM", ]
 
 plot(income_tr_stem$GPA, income_tr_stem$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
 plot(1.2^(income_tr_stem$GPA), income_tr_stem$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
+plot(sqrt(income_tr_stem$GPA), income_tr_stem$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
 
+income_tr_stem_c <- income_tr_stem[income_tr_stem$CollegeLocation=="WestCoast", ]
+
+income_tr_stem_odd <- income_tr_stem[income_tr_stem$DOB %% 2 == 0, ]
+
+head(income_tr_stem_odd)
+head(income_tr_stem_c)
+
+# Plot with STEM majors at West Coast with GPA and Salary
+plot(income_tr_stem_c$GPA, income_tr_stem_c$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
+
+# Plot with STEM majors born on even years with GPA and Salary
+plot(income_tr_stem_odd$GPA, income_tr_stem_odd$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
+
+# Different plots
+plot(income_tr_stem_play$GPA, income_tr_stem_play$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
 
 plot(income_tr_stem$DOB, income_tr_stem$Salary, main="Year and Salary", xlab="Year", ylab="Salary", col=colors_vector)
 
@@ -63,6 +84,13 @@ plot(log(income_tr_stem$LinkedIN), income_tr_stem$Salary, main="LinkedIn and Sal
 income_tr_v <- income_tr[income_tr$Major=="Vocational",]
 
 plot(income_tr_v$GPA, income_tr_v$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
+
+income_tr_v_c <- income_tr_v[income_tr_v$CollegeLocation=="WestCoast", ]
+
+plot(income_tr_v_c$GPA, income_tr_v_c$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
+
+
+
 
 plot(income_tr_v$DOB, income_tr_v$Salary, main="Year and Salary", xlab="Year", ylab="Salary", col=colors_vector)
 
@@ -100,29 +128,56 @@ plot(log(income_tr_h$LinkedIN), income_tr_h$Salary, main="LinkedIn and Salary", 
 model1 <- lm(Salary ~ SquareLi, data = income_tr[income_tr$Major == "Other", ])
 
 # Decision Tree Model for Major!="Other"
-model01 <- rpart(Salary ~ Major, data = income_tr[income_tr$Major != "Other" & income_tr$Major!="Buisness", ], method = "anova")
+# model707 <- rpart(Salary ~ Major+GPA, data = income_tr[income_tr$Major != "Other" & income_tr$Major!="Buisness", ], method = "anova")
 
 # Linear Regression Model for Major=="Buisness" and DOB%%2==0
-model001 <- lm(Salary ~ GPA, data=income_tr[income_tr$Major == "Buisness" & income_tr$DOB%%2 == 0, ])
-model002 <- lm(Salary ~ GPA, data=income_tr[income_tr$Major == "Buisness" & income_tr$DOB%%2 == 1, ])
+model201 <- lm(Salary ~ GPA, data=income_tr[income_tr$Major == "Buisness" & income_tr$DOB%%2 == 0, ])
+model202 <- lm(Salary ~ GPA, data=income_tr[income_tr$Major == "Buisness" & income_tr$DOB%%2 == 1, ])
+
+# Linear Regression Models for all other Majors with GPA
+model3 <- lm(Salary ~ GPA, data = income_tr[income_tr$Major == "Humanities", ])
+model4 <- lm(Salary ~ GPA, data = income_tr[income_tr$Major == "STEM", ])
+model5 <- lm(Salary ~ GPA, data = income_tr[income_tr$Major == "Vocational", ])
+model6 <- lm(Salary ~ GPA, data = income_tr[income_tr$Major == "Professional", ])
+
+# Decision Tree for all majors
+# model3 <- rpart(Salary ~ GPA+CollegeLocation, data = income_tr[income_tr$Major == "Humanities", ], method = "anova")
+# model4 <- rpart(Salary ~ GPA+CollegeLocation, data = income_tr[income_tr$Major == "STEM", ], method = "anova")
+# model5 <- rpart(Salary ~ GPA+CollegeLocation, data = income_tr[income_tr$Major == "Vocational", ], method = "anova")
+# model6 <- rpart(Salary ~ GPA+CollegeLocation, data = income_tr[income_tr$Major == "Professional", ], method = "anova")
+
 
 # Predictions
 pred1 <- predict(model1, newdata = income_tr[income_tr$Major == "Other", ])
-pred01 <- predict(model01, newdata = income_tr[income_tr$Major != "Other" & income_tr$Major != "Buisness", ])
-pred001 <- predict(model001, newdata = income_tr[income_tr$Major == "Buisness" & income_tr$DOB%%2 == 0, ])
-pred002 <- predict(model002, newdata = income_tr[income_tr$Major == "Buisness" & income_tr$DOB%%2 == 1, ])
+pred201 <- predict(model201, newdata = income_tr[income_tr$Major == "Buisness" & income_tr$DOB%%2 == 0, ])
+pred202 <- predict(model202, newdata = income_tr[income_tr$Major == "Buisness" & income_tr$DOB%%2 == 1, ])
+pred3 <- predict(model3, newdata = income_tr[income_tr$Major == "Humanities", ])
+pred4 <- predict(model4, newdata = income_tr[income_tr$Major == "STEM", ])
+pred5 <- predict(model5, newdata = income_tr[income_tr$Major == "Vocational", ])
+pred6 <- predict(model6, newdata = income_tr[income_tr$Major == "Professional", ])
+
+# pred707 <- predict(model707, income_tr[income_tr$Major != "Other" & income_tr$Major!="Buisness", ])
+
+
 
 # Combine Predictions
 decision <- rep(0, nrow(income_tr))
 decision[income_tr$Major == "Other"] <- pred1
-decision[income_tr$Major != "Other" & income_tr$Major!="Buisness"] <- pred01
-decision[income_tr$Major == "Buisness" & income_tr$DOB%%2 == 0] <- pred001
-decision[income_tr$Major == "Buisness" & income_tr$DOB%%2 == 1] <- pred002
+decision[income_tr$Major == "Buisness" & income_tr$DOB%%2 == 0] <- pred201
+decision[income_tr$Major == "Buisness" & income_tr$DOB%%2 == 1] <- pred202
+decision[income_tr$Major == "Humanities"] <- pred3
+decision[income_tr$Major == "STEM"] <- pred4
+decision[income_tr$Major == "Vocational"] <- pred5
+decision[income_tr$Major == "Professional"] <- pred6
+
+
 
 # Calculate Mean Squared Error
 mse <- mean((decision - income_tr$Salary)^2)
 mse # 12,170
-# 1702
+# 1702.478
+# 141
+# 89
 
 
 
