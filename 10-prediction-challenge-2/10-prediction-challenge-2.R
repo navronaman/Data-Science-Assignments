@@ -57,13 +57,13 @@ boxplot(Salary~Major, data=income_tr[income_tr$Major!="Other", ], xlab="Location
 
 income_tr_o <- income_tr[income_tr$Major=="Other", ]
 
-plot(income_tr_o$GPA, income_tr_o$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
+plot(income_tr_o$GPA, income_tr_o$Salary, main="GPA and Salary for Other Majors", xlab="GPA", ylab="Salary", col=colors_vector)
 
 plot(income_tr_o$DOB, income_tr_o$Salary, main="Year and Salary", xlab="Year", ylab="Salary", col=colors_vector)
 
 plot(income_tr_o$Tuition, income_tr_o$Salary, main="Tuition and Salary", xlab="Tuition", ylab="Salary", col=colors_vector)
 
-plot(income_tr_o$LinkedIN, income_tr_o$Salary, main="LinkedIn and Salary", xlab="LinkedIn", ylab="Salary", col=colors_vector)
+plot(income_tr_o$LinkedIN, income_tr_o$Salary, main="No. of LinkedIn Connections and Salary for Other Majors", xlab="LinkedIn", ylab="Salary", col=colors_vector)
 
 plot(income_tr_o$SquareLi, income_tr_o$Salary, main="No. of LinkedIn Squared and Salary for Other Majors", xlab="LinkedIn", ylab="Salary", col=colors_vector)
 
@@ -73,8 +73,10 @@ plot(income_tr_o$SquareLi, income_tr_o$Salary, main="No. of LinkedIn Squared and
 income_tr_bus <- income_tr[income_tr$Major=="Buisness", ]
 
 plot(income_tr_bus$GPA, income_tr_bus$Salary, main="GPA and Salary for Business Majors", xlab="GPA", ylab="Salary", col=colors_vector)
+plot(income_tr_bus$DOB, income_tr_bus$Salary, main="Year of Birth and Salary for Business Majors", xlab="GPA", ylab="Salary", col=colors_vector)
 # Two distinct salaries
 # Let's use RPart for Business
+
 
 income_tr_bus_odd <- income_tr_bus[income_tr_bus$DOB %% 2 == 0, ]
 income_tr_bus_even <- income_tr_bus[income_tr_bus$DOB %% 2 == 1, ]
@@ -166,9 +168,6 @@ plot(log(income_tr_h$LinkedIN), income_tr_h$Salary, main="LinkedIn and Salary", 
 # Linear Regression Model for Major=="Other"
 model1 <- lm(Salary ~ SquareLi, data = income_tr[income_tr$Major == "Other", ])
 
-# Decision Tree Model for Major!="Other"
-# model707 <- rpart(Salary ~ Major+GPA, data = income_tr[income_tr$Major != "Other" & income_tr$Major!="Buisness", ], method = "anova")
-
 # Linear Regression Model for Major=="Buisness" and DOB%%2==0
 model201 <- lm(Salary ~ GPA, data=income_tr[income_tr$Major == "Buisness" & income_tr$DOB%%2 == 0, ])
 model202 <- lm(Salary ~ GPA, data=income_tr[income_tr$Major == "Buisness" & income_tr$DOB%%2 == 1, ])
@@ -221,6 +220,33 @@ mse # 12,170
 mean_mse <- mse(income_tr$Salary, decision)
 mean_mse
 # 89.76286
+
+# Let's write the submission file
+
+pred1_final <- predict(model1, newdata = income_te[income_te$Major == "Other", ])
+pred201_final <- predict(model201, newdata = income_te[income_te$Major == "Buisness" & income_tr$DOB%%2 == 0, ])
+pred202_final <- predict(model202, newdata = income_te[income_te$Major == "Buisness" & income_tr$DOB%%2 == 1, ])
+pred3_final <- predict(model3, newdata = income_te[income_te$Major == "Humanities", ])
+pred4_final <- predict(model4, newdata = income_te[income_te$Major == "STEM", ])
+pred5_final <- predict(model5, newdata = income_te[income_te$Major == "Vocational", ])
+pred6_final <- predict(model6, newdata = income_te[income_te$Major == "Professional", ])
+
+decision_final <- rep(0, nrow(income_te))
+decision_final[income_te$Major == "Other"] <- pred1_final
+decision_final[income_te$Major == "Buisness" & income_tr$DOB%%2 == 0] <- pred201_final
+decision_final[income_te$Major == "Buisness" & income_tr$DOB%%2 == 1] <- pred202_final
+decision_final[income_te$Major == "Humanities"] <- pred3_final
+decision_final[income_te$Major == "STEM"] <- pred4_final
+decision_final[income_te$Major == "Vocational"] <- pred5_final
+decision_final[income_te$Major == "Professional"] <- pred6_final
+
+ids<-c(1:nrow(income_te))
+submission$ID<-ids
+
+submission$RATING<-decision_final
+submission
+write.csv(submission, 'A:/Jeevan/Rutgers 2023-2024/Classes/DATA101/Assignment 10/submissionIncome2023.csv', row.names=FALSE)
+
 
 
 
