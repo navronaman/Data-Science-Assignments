@@ -1,3 +1,6 @@
+install.packages("ModelMetrics")
+library(ModelMetrics)
+
 library(rpart)
 library(rpart.plot)
 
@@ -6,6 +9,10 @@ income_te <- read.csv('https://raw.githubusercontent.com/paramshah4/data101_tuto
 
 income_tr$CollegeLocation <- income_tr$College_location
 income_tr$SquareLi <- income_tr$LinkedIN ^ 2
+income_te$SquareLi <- income_te$LinkedIN ^ 2
+
+summary(income_tr)
+summary(income_te)
 
 unique(income_tr$Major)
 
@@ -16,7 +23,8 @@ colors_vector <- c("#1f78b4", "#33a02c", "#e31a1c", "#ff7f00", "#6a3d9a",
                    "#b15928", "#a6cee3", "#b2df8a", "#fb9a99", "#fdbf6f",
                    "#cab2d6", "#ffff99", "#b15928", "#8dd3c7", "#bebada")
 
-# Barplots
+## Barplots
+
 # numerical variables, bar plots
 plot(income_tr$GPA, income_tr$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
 # some outliers with low GPAs and insane good salaries, but mostly no relationship
@@ -29,18 +37,42 @@ plot(income_tr$Tuition, income_tr$Salary, main="Tuition and Salary", xlab="Tuiti
 
 plot(log(income_tr$LinkedIN), income_tr$Salary, main="Linkedin and Salary", xlab="LinkedIn", ylab="Salary", col=colors_vector)
 
-plot(income_tr$LinkedIN^2, income_tr$Salary, main="Linkedin and Salary", xlab="LinkedIn", ylab="Salary", col=colors_vector)
+plot(income_tr$LinkedIN^2, income_tr$Salary, main="(Linkedin)^2 and Salary", xlab="LinkedIn", ylab="Salary", col=colors_vector)
 # VERY INTERESTING, some relationship in salary and no of connections
 
-# Let's see for each indivisual major
+## Boxplot
 
-plot(income_tr[income_tr$Major=="Other", ]$SquareLi, income_tr[income_tr$Major=="Other", ]$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
+boxplot(Salary~CollegeLocation, data=income_tr, xlab="Location", ylab="Salary", main="Boxplot of Salary vs Location", col=c("khaki", "cyan"))
+# except outliers, pretty standard
+
+boxplot(Salary~Major, data=income_tr[income_tr$Major!="Other", ], xlab="Location", ylab="Salary", main="Boxplot of Salary vs Location", col=colors_vector)
+# so many outliers in other
+# if we remove others, these are the rankings
+# 1. Vocational, 2. Professional, 3. Humanities, 4. Business, 5. STEM
 
 
-# Business
+# Let's see for each individual major
+
+## Other
+
+income_tr_o <- income_tr[income_tr$Major=="Other", ]
+
+plot(income_tr_o$GPA, income_tr_o$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
+
+plot(income_tr_o$DOB, income_tr_o$Salary, main="Year and Salary", xlab="Year", ylab="Salary", col=colors_vector)
+
+plot(income_tr_o$Tuition, income_tr_o$Salary, main="Tuition and Salary", xlab="Tuition", ylab="Salary", col=colors_vector)
+
+plot(income_tr_o$LinkedIN, income_tr_o$Salary, main="LinkedIn and Salary", xlab="LinkedIn", ylab="Salary", col=colors_vector)
+
+plot(income_tr_o$SquareLi, income_tr_o$Salary, main="No. of LinkedIn Squared and Salary for Other Majors", xlab="LinkedIn", ylab="Salary", col=colors_vector)
+
+# No. of LinkedIn connections is the biggest indicator of Salary for Other Majors
+
+## Business
 income_tr_bus <- income_tr[income_tr$Major=="Buisness", ]
 
-plot(income_tr_bus$GPA, income_tr_bus$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
+plot(income_tr_bus$GPA, income_tr_bus$Salary, main="GPA and Salary for Business Majors", xlab="GPA", ylab="Salary", col=colors_vector)
 # Two distinct salaries
 # Let's use RPart for Business
 
@@ -51,10 +83,11 @@ plot(income_tr_bus_odd$GPA, income_tr_bus_odd$Salary, main="GPA and Salary for B
 plot(income_tr_bus_even$GPA, income_tr_bus_even$Salary, main="GPA and Salary for Business Majors born in odd years", xlab="GPA", ylab="Salary", col=colors_vector)
 
 
-# STEM
+## STEM
 income_tr_stem <- income_tr[income_tr$Major=="STEM", ]
 
-plot(income_tr_stem$GPA, income_tr_stem$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
+plot(income_tr_stem$GPA, income_tr_stem$Salary, main="GPA and Salary for STEM Majors", xlab="GPA", ylab="Salary", col=colors_vector)
+
 plot(1.2^(income_tr_stem$GPA), income_tr_stem$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
 plot(sqrt(income_tr_stem$GPA), income_tr_stem$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
 
@@ -66,7 +99,7 @@ head(income_tr_stem_odd)
 head(income_tr_stem_c)
 
 # Plot with STEM majors at West Coast with GPA and Salary
-plot(income_tr_stem_c$GPA, income_tr_stem_c$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
+plot(income_tr_stem_c$GPA, income_tr_stem_c$Salary, main="GPA and Salary for STEM Majors", xlab="GPA", ylab="Salary", col=colors_vector)
 
 # Plot with STEM majors born on even years with GPA and Salary
 plot(income_tr_stem_odd$GPA, income_tr_stem_odd$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
@@ -80,17 +113,17 @@ plot(income_tr_stem$Tuition, income_tr_stem$Salary, main="Tuition and Salary", x
 
 plot(log(income_tr_stem$LinkedIN), income_tr_stem$Salary, main="LinkedIn and Salary", xlab="LinkedIn", ylab="Salary", col=colors_vector)
 
-# Vocational
+# Best predictor for salaries of STEM Major is their GPA, so we will use Linear Regression
+
+
+## Vocational
 income_tr_v <- income_tr[income_tr$Major=="Vocational",]
 
-plot(income_tr_v$GPA, income_tr_v$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
+plot(income_tr_v$GPA, income_tr_v$Salary, main="GPA and Salary for Vocational Majors", xlab="GPA", ylab="Salary", col=colors_vector)
 
 income_tr_v_c <- income_tr_v[income_tr_v$CollegeLocation=="WestCoast", ]
 
 plot(income_tr_v_c$GPA, income_tr_v_c$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
-
-
-
 
 plot(income_tr_v$DOB, income_tr_v$Salary, main="Year and Salary", xlab="Year", ylab="Salary", col=colors_vector)
 
@@ -98,11 +131,13 @@ plot(income_tr_v$Tuition, income_tr_v$Salary, main="Tuition and Salary", xlab="T
 
 plot(log(income_tr_v$LinkedIN), income_tr_v$Salary, main="LinkedIn and Salary", xlab="LinkedIn", ylab="Salary", col=colors_vector)
 
-# Professional
+# Best predictor for salaries of Vocational Major is their GPA, so we will use Linear Regression
+
+## Professional
 
 income_tr_p <- income_tr[income_tr$Major=="Professional", ]
 
-plot(income_tr_p$GPA, income_tr_p$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
+plot(income_tr_p$GPA, income_tr_p$Salary, main="GPA and Salary for Professional Majors", xlab="GPA", ylab="Salary", col=colors_vector)
 
 plot(income_tr_p$DOB, income_tr_p$Salary, main="Year and Salary", xlab="Year", ylab="Salary", col=colors_vector)
 
@@ -110,17 +145,21 @@ plot(income_tr_p$Tuition, income_tr_p$Salary, main="Tuition and Salary", xlab="T
 
 plot(log(income_tr_p$LinkedIN), income_tr_p$Salary, main="LinkedIn and Salary", xlab="LinkedIn", ylab="Salary", col=colors_vector)
 
-# Humanities
+# Best predictor for salaries of Professional Major is their GPA, so we will use Linear Regression
+
+## Humanities
 
 income_tr_h <- income_tr[income_tr$Major=="Humanities", ]
 
-plot(income_tr_h$GPA, income_tr_h$Salary, main="GPA and Salary", xlab="GPA", ylab="Salary", col=colors_vector)
+plot(income_tr_h$GPA, income_tr_h$Salary, main="GPA and Salary for Humanities Majors", xlab="GPA", ylab="Salary", col=colors_vector)
 
 plot(income_tr_h$DOB, income_tr_h$Salary, main="Year and Salary", xlab="Year", ylab="Salary", col=colors_vector)
 
 plot(income_tr_h$Tuition, income_tr_h$Salary, main="Tuition and Salary", xlab="Tuition", ylab="Salary", col=colors_vector)
 
 plot(log(income_tr_h$LinkedIN), income_tr_h$Salary, main="LinkedIn and Salary", xlab="LinkedIn", ylab="Salary", col=colors_vector)
+
+# Best predictor for salaries of Humanities Major is their GPA, so we will use Linear Regression
 
 
 ####
@@ -178,6 +217,10 @@ mse # 12,170
 # 1702.478
 # 141
 # 89
+
+mean_mse <- mse(income_tr$Salary, decision)
+mean_mse
+# 89.76286
 
 
 
