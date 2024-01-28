@@ -1,0 +1,87 @@
+---
+title: "Assignment 01: Regression"
+author: "Naman Shah"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+## Assignment 1 - Getting started with Regression
+
+Let's load the data and the libraries
+
+
+```{r, results='hide', include=FALSE, echo=TRUE}
+library("tidyverse")
+library("moderndive")
+library("skimr")
+source("regday1.pck")
+```
+```{r}
+regday1.pck
+```
+
+Let's explore the data and the functions
+
+
+```{r}
+head(NOAAGISSWD)
+summary(NOAAGISSWD)
+
+gauss.reg1 <-
+function(x,y,lambda=0.06,xcol=4,do.plot=T)
+{
+o1<-order(x)
+x1<-x[o1]
+y1<-y[o1]
+r1<-range(x)
+smat<-NULL
+n1<-length(x1)
+for(i in 1:n1){
+        v1<-dnorm(x1,x1[i],lambda)
+        v1<-v1/sum(v1)
+        H1<-my.hat.w(x1,v1)
+        smat<-rbind(smat,H1[i,])
+}
+yhat<-smat%*%y1
+if(do.plot){
+lines(x1,yhat,col=xcol)
+}
+n99<-length(x1)
+dferror<-length(x1)-sum(diag(2*smat-smat%*%(t(smat))))
+delta1<-sum(diag(t(diag(n99)-smat)%*%(diag(n99)-smat)))
+R<-t(diag(n99)-smat)%*%(diag(n99)-smat)
+delta2<-2*sum(diag(R%*%R))
+resid<-y1-smat%*%y1
+ypred<-y1
+ypred[o1]<-smat%*%y1
+PRESS<-sum((resid/(1-diag(smat)))^2)
+list(smat=smat,df=sum(diag(smat)),dferror=dferror,delta1=delta1,delta2=delta2,resid=resid,pred.out=ypred[o1],x.out=x1,press=PRESS,cor=cor(ypred,y))
+}
+
+```
+
+We're setting lamda to 0.06 to work with temperature.
+For the first set of regression graphs, we will take x to be temperature and assign the y values to the following:
+
+* Drought Count
+
+* Flooding Count
+
+* Severe Storm Count
+
+* Tropical Cyclone Count
+
+* Wildfire Count
+
+* Winter Storm Count
+
+* All Disasters Count
+
+Let's start with **Drought Count** compared with **Delta Temperature**
+```{r}
+plot(NOAAGISSWD$delta.temp, NOAAGISSWD$Drought.Count, main="Correlation between delta temp and drought counts", xlab="Temp", ylab="Drought Count", col="red")
+
+bootmatsmooth(NOAAGISSWD$delta.temp, NOAAGISSWD$Drought.Count)
+bootmatlin(NOAAGISSWD$delta.temp, NOAAGISSWD$Drought.Count)
+```
+
