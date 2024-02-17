@@ -22,9 +22,15 @@ hittersAE <- hittersA[hittersA$Division == 'E',]
 hittersAW <- hittersA[hittersA$Division == 'W',]
 
 boxplot(hittersNE$Salary, hittersNW$Salary, 
-        hittersAE$Salary, hittersAW$Salary)
+        hittersAE$Salary, hittersAW$Salary,
+        col=colors_vector, main="Boxplot of divisions salary")
+
+mainBoxLegend = c('NE Salary', 'NW Salary', 'AE Salary', 'AW Salary')
+legend('topright', legend = mainBoxLegend, fill = colors, border = 'black', cex = 1)
+
 
 #Question 1
+# Answered by my partner Anthony Li, as stated below:
 #The median for the NW, NE, and AW leagues are effectively the same.
 #The AE league has a lower median, however. 
 #All leagues have effectively the same interquartile range,
@@ -97,98 +103,67 @@ larsAE$Cp[19]
 #correlated to salary. 
 
 #NW
-plot(as.matrix(XNW)%*%larsNW$beta[19,] + larsNW$mu, YNW, main = 'NW with NW, lars')
+plot(as.matrix(XNW)%*%larsNW$beta[19,] + larsNW$mu, YNW, main = 'NW with NW, lars', col="red")
 cor(as.matrix(XNW)%*%larsNW$beta[19,] + larsNW$mu, YNW)
 cor(as.matrix(XNW)%*%larsNW$beta[19,] + larsNW$mu, YNW)^2
 #0.775, r-squared = 0.600
 lmNWBase <- cbind(XNW, YNW)
 lmNW <- lm(YNW~., data = lmNWBase)
-plot(predict(lmNW, XNW), YNW)
+plot(predict(lmNW, XNW), YNW, main="NW with NW, lm", col="blue")
 
 #NE
-plot(as.matrix(XNE)%*%larsNE$beta[19,] + larsNE$mu, YNE, main = "NE with NE, lars")
+plot(as.matrix(XNE)%*%larsNE$beta[19,] + larsNE$mu, YNE, main = "NE with NE, lars", col="red")
 cor(as.matrix(XNE)%*%larsNE$beta[19,] + larsNE$mu, YNE)
 cor(as.matrix(XNE)%*%larsNE$beta[19,] + larsNE$mu, YNE)^2
 #0.725, r-squared = 0.525
 lmNEBase <- cbind(XNE, YNE)
 lmNE <- lm(YNE~., data = lmNEBase)
-plot(predict(lmNE, XNE), YNE)
+plot(predict(lmNE, XNE), YNE, main="NE with NE, lm", col="blue")
 
 #AW
-plot(as.matrix(XAW)%*%larsAW$beta[19,] + larsAW$mu, YAW)
+plot(as.matrix(XAW)%*%larsAW$beta[19,] + larsAW$mu, YAW, col="red")
 cor(as.matrix(XAW)%*%larsAW$beta[19,] + larsAW$mu, YAW)
 cor(as.matrix(XAW)%*%larsAW$beta[19,] + larsAW$mu, YAW)^2
 #0.853, r-squared = 0.727
 lmAWBase <- cbind(XAW, YAW)
 lmAW <- lm(YAW~., data = lmAWBase)
-plot(predict(lmAW, XAW), YAW, main = 'AW with AW, lm')
+plot(predict(lmAW, XAW), YAW, main = 'AW with AW, lm', col="blue")
 
 #AE 
-plot(as.matrix(XAE)%*%larsAE$beta[19,] + larsAE$mu, YAE)
+plot(as.matrix(XAE)%*%larsAE$beta[19,] + larsAE$mu, YAE, col="red")
 cor(as.matrix(XAE)%*%larsAE$beta[19,] + larsAE$mu, YAE)
 cor(as.matrix(XAE)%*%larsAE$beta[19,] + larsAE$mu, YAE)^2
 #0.889, r-squared = 0.790
 lmAEBase <- cbind(XAE, YAE)
 lmAE <- lm(YAE~., data = lmAEBase)
-plot(predict(lmAE, XAE), YAE, main = 'AE with AE, lm')
-
-#Anything below this line was my work, you can delete it. 
-
-#Predicting AW with other lm models
-plot(predict(lmAE, XAW), YAW, main = 'AW with lmAE')
-lmAWwAE <- predict(lmAE, XAW)
-
-plot(predict(lmNW, XAW), YAW, main = 'AW with lmNW')
-lmAWwNW <- predict(lmNW, XAW)
-
-plot(predict(lmNE, XAW), YAW, main = 'AW with lmNE')
-lmAWwNE <- predict(lmNE, XAW)
-
-#Predicting AE with other lm models 
-plot(predict(lmAW, XAE), YAE, main = 'AE with lmAW')
-lmAEwAW <- predict(lmAW, XAE)
-
-plot(predict(lmNW, XAE), YAE, main = 'AE with lmNW')
-lmAEwNW <- predict(lmNW, XAE)
-
-plot(predict(lmNE, XAE), YAE, main = 'AE with lmNE')
-lmAEwNE <- predict(lmNE, XAE)
+plot(predict(lmAE, XAE), YAE, main = 'AE with AE, lm', col="blue")
 
 #Predicting NE with other lm models
-plot(predict(lmAE, XNE), YNE, main = 'NE with lmAE')
+plot(predict(lmAE, XNE), YNE, main = 'NE with lmAE', col="blue")
 lmNEwAE <- predict(lmAE, XNE)
 
-plot(predict(lmAW, XNE), YNE, main = "NE with lmAW")
+plot(predict(lmAW, XNE), YNE, main = "NE with lmAW", col="blue")
 lmNEwAW <- predict(lmAW, XNE)
 
-plot(predict(lmNE, XNE), YNE, main = "NE with lmNE")
+plot(predict(lmNE, XNE), YNE, main = "NE with lmNE", col="blue")
+lmNEwNE <- predict(lmNE)
 
-plot(predict(lmNW, XNE), YNE, main = "NE with lmNW")
+plot(predict(lmNW, XNE), YNE, main = "NE with lmNW", col="blue")
 lmNEwNW <- predict(lmNW, XNE)
 
 #Predicting NW with other lm models
 
-plot(predict(lmAE, XNW), YNW, main = 'NW with lmAE')
+plot(predict(lmAE, XNW), YNW, main = 'NW with lmAE', col="blue")
 lmNWwAE <- predict(lmAE, XNW)
 
-plot(predict(lmAW, XNW), YNW, main = "NW with lmAW")
+plot(predict(lmAW, XNW), YNW, main = "NW with lmAW", col="blue")
 lmNWwAW <- predict(lmAW, XNW)
 
-plot(predict(lmNE, XNE), YNW, main = "NW with lmNE")
-lmNWwNE <- predict(lmNe, XNW)
+plot(predict(lmNE, XNW), YNW, main = "NW with lmNE", col="blue")
+lmNWwNE <- predict(lmNE, XNW)
 
-plot(predict(lmNW, XNW), YNW, main = "NE with lmNW")
-
-
-#Predicting AW with other lars models
-larsAWwAE <- predict(larsAE, XAW)
-larsAWwNW <- predict(larsNW, XAW)
-larsAWwNE <- predict(larsNE, XAW)
-
-#Predicting AE with other lars models 
-larsAEwAW <- predict(larsAW, XAE)
-larsAEwNW <- predict(larsNW, XAE)
-larsAEwNE <- predict(larsNW, XAE)
+plot(predict(lmNW, XNW), YNW, main = "NE with lmNW", col="blue")
+lmNWwNW <- predict(lmNW)
 
 #Predicting NE with other lars model
 larsNEwAE <- predict(larsAE, XNE)
@@ -204,40 +179,6 @@ larsNWwNE <- predict(larsNE, XNW)
 #boxplotting
 
 #lars
-
-#AE
-AE.AE <- as.matrix(XAE)%*%larsAE$beta[19,]
-AE.AW <- as.matrix(XAE)%*%larsAW$beta[5,]
-AE.NE <- as.matrix(XAE)%*%larsNE$beta[9,]
-AE.NW <- as.matrix(XAE)%*%larsNW$beta[17,]
-#normalize means
-AE.AE <- AE.AE - mean(AE.AE) + larsAE$mu 
-AE.AW <- AE.AW - mean(AE.AW) + larsAW$mu
-AE.NE <- AE.NE - mean(AE.NE) + larsNE$mu
-AE.NW <- AE.NW - mean(AE.NW) + larsNW$mu
-boxplot(hittersAE$Salary, c(as.matrix(AE.AE)), c(as.matrix(AE.AW)),
-        c(as.matrix(AE.NW)), c(as.matrix(AE.NE)),
-        main = 'AE compared to All, lars', col = colors)
-larsAELegend = c('Actual Salary', 'AE with AE', 'AE with AW',
-                 'AE with NW', 'AE with NE')
-legend('topright', legend = larsAELegend, fill = colors, border = 'black', cex = 0.36)
-
-#AW
-AW.AE <- as.matrix(XAW)%*%larsAE$beta[19,]
-AW.AW <- as.matrix(XAW)%*%larsAW$beta[5,]
-AW.NE <- as.matrix(XAW)%*%larsNE$beta[9,]
-AW.NW <- as.matrix(XAW)%*%larsNW$beta[17,]
-#normalize means 
-AW.AE <- AW.AE - mean(AW.AE) + larsAE$mu
-AW.AW <- AW.AW - mean(AW.AW) + larsAW$mu
-AW.NW <- AW.NW - mean(AW.NW) + larsNW$mu
-AW.NE <- AW.NE - mean(AW.NE) + larsNE$mu 
-boxplot(hittersAE$Salary, c(as.matrix(AW.AE)), c(as.matrix(AW.AW)),
-        c(as.matrix(AW.NW)), c(as.matrix(AW.NE)),
-        main = 'AW compared to All, lars', col = colors)
-larsAWLegend = c('Actual Salary', 'AW with AE', 'AW with AW',
-                 'AW with NW', 'AW with NE')
-legend('topright', legend = larsAWLegend, fill = colors, border = 'black', cex = 0.5)
 
 #NE
 NE.AE <- as.matrix(XNE)%*%larsAE$beta[19,]
@@ -272,122 +213,70 @@ NW.NW <- NW.NW - mean(NW.NW) + larsNW$mu
 boxplot(hittersNE$Salary, c(as.matrix(NW.NW)), c(as.matrix(NW.AE)),
         c(as.matrix(NW.AW)), c(as.matrix(NW.NE)),
         main = 'NW compared to All, lars', col = colors_vector)
-larsNELegend = c('Actual Salary (NE)', 'NW with NW','NW with AE', 'NW with AW',
+larsNELegend = c('Actual Salary (NW)', 'NW with NW','NW with AE', 'NW with AW',
                  'NW with NE')
 legend('topright', legend = larsNELegend, fill = colors_vector, border = 'black', cex = 1)
 
 
 #lm 
 
-## Li
-#AE
-lmAE.AE <- predict(lmAE)
-boxplot(hittersAE$Salary, lmAE.AE, lmAEwAW, lmAEwNW, lmAEwNE, 
-        main = 'AE compared with all, lm', col = colors)
-lmAELegend = c('Actual Salary', 'AE with AE', 'AE with AW',
-                 'AE with NW', 'AE with NE')
-legend('topright', legend = lmAELegend, fill = colors, border = 'black', cex = 0.5)
+#NE
+boxplot(hittersNE$Salary, lmNEwNE, lmNEwAE, lmNEwAW, lmNEwNW, 
+        main = 'NE compared with all, lm', col = colors_vector)
+lmAWLegend = c('Actual Salary (NE)', 'NE with AE', 'NE with AW',
+               'NE with NE', 'NE with NW')
+legend('topright', legend = lmAWLegend, fill = colors_vector, border = 'black', cex = 1)
 
-
-#AW
-lmAW.AW <- predict(lmAW)
-boxplot(hittersAW$Salary, lmAW.AW, lmAWwAE, lmAWwNW, lmAWwNE, 
-        main = 'AW compared with all, lm', col = colors)
-lmAWLegend = c('Actual Salary', 'AW with AE', 'AW with AW',
-                 'AW with NW', 'AW with NE')
-legend('topright', legend = lmAWLegend, fill = colors, border = 'black', cex = 0.5)
-## Li
 
 #NE
-lmNE.NE <- predict(lmNE)
-boxplot(hittersNE$Salary, lmNE.NE, lmNEwAE, lmNEwNW, lmNEwNE, 
-        main = 'NE compared with all, lm', col = colors)
-lmAWLegend = c('Actual Salary (NE)', 'AW with AE', 'AW with AW',
-               'AW with NW', 'AW with NE')
-legend('topright', legend = lmAWLegend, fill = colors, border = 'black', cex = 0.5)
+boxplot(hittersNE$Salary, lmNWwNW, lmNWwAE, lmNWwAW, lmNWwNE, 
+        main = 'NE compared with all, lm', col = colors_vector)
+lmAWLegend = c('Actual Salary (NW)', 'NW with NW','NW with AE', 'NW with AW','NE with NW')
+legend('topright', legend = lmAWLegend, fill = colors_vector, border = 'black', cex = 1)
 
 
 
-#scatters 
-
-#AE
-#lars
-plot(as.matrix(AE.AE), hittersAE$Salary, main = 'AE with AE, lars,',
-     xlab = 'lars', ylab = 'Actual')
-plot(as.matrix(AE.AW), hittersAE$Salary, main = 'AE with AW, lars,',
-     xlab = 'lars', ylab = 'Actual')
-plot(as.matrix(AE.NE), hittersAE$Salary, main = 'AE with NE, lars,',
-     xlab = 'lars', ylab = 'Actual')
-plot(as.matrix(AE.NW), hittersAE$Salary, main = 'AE with NW, lars,',
-     xlab = 'lars', ylab = 'Actual')
-#lm
-plot(as.matrix(lmAE.AE), hittersAE$Salary, main = 'AE with AE, lm', 
-     xlab = 'lm', ylab = 'Actual')
-plot(as.matrix(lmAEwAW), hittersAE$Salary, main = 'AE with AW, lm', 
-     xlab = 'lm', ylab = 'Actual')
-plot(as.matrix(lmAEwNE), hittersAE$Salary, main = 'AE with NE, lm', 
-     xlab = 'lm', ylab = 'Actual')
-plot(as.matrix(lmAEwNW), hittersAE$Salary, main = 'AE with NW, lm', 
-     xlab = 'lm', ylab = 'Actual')
-
-#AW
-#lars
-plot(as.matrix(AW.AE), hittersAW$Salary, main = 'AW with AE, lars,',
-     xlab = 'lars', ylab = 'Actual')
-plot(as.matrix(AW.AW), hittersAW$Salary, main = 'AW with AW, lars,',
-     xlab = 'lars', ylab = 'Actual')
-plot(as.matrix(AW.NE), hittersAW$Salary, main = 'AW with NE, lars,',
-     xlab = 'lars', ylab = 'Actual')
-plot(as.matrix(AW.NW), hittersAW$Salary, main = 'AW with NW, lars,',
-     xlab = 'lars', ylab = 'Actual')
-#lm 
-plot(as.matrix(lmAW.AE), hittersAE$Salary, main = 'AW with AE, lm', 
-     xlab = 'lm', ylab = 'Actual')
-plot(as.matrix(lmAWwAW), hittersAE$Salary, main = 'AW with AW, lm', 
-     xlab = 'lm', ylab = 'Actual')
-plot(as.matrix(lmAWwNE), hittersAE$Salary, main = 'AW with NE, lm', 
-     xlab = 'lm', ylab = 'Actual')
-plot(as.matrix(lmAWwNW), hittersAE$Salary, main = 'AW with NW, lm', 
-     xlab = 'lm', ylab = 'Actual')
+#scatters for NE and NW
 
 # NE
 # lars
 plot(as.matrix(NE.AE), hittersNE$Salary, main = 'NE with AE, lars',
-     xlab = 'lars', ylab = 'Actual')
+     xlab = 'lars', ylab = 'Actual', col="red")
 plot(as.matrix(NE.AW), hittersNE$Salary, main = 'NE with AW, lars',
-     xlab = 'lars', ylab = 'Actual')
+     xlab = 'lars', ylab = 'Actual', col="red")
 plot(as.matrix(NE.NE), hittersNE$Salary, main = 'NE with NE, lars',
-     xlab = 'lars', ylab = 'Actual')
+     xlab = 'lars', ylab = 'Actual', col="red")
 plot(as.matrix(NE.NW), hittersNE$Salary, main = 'NE with NW, lars',
-     xlab = 'lars', ylab = 'Actual')
+     xlab = 'lars', ylab = 'Actual', col="red")
 
 # lm
-plot(as.matrix(lmNE.AE), hittersNE$Salary, main = 'NE with AE, lm',
-     xlab = 'lm', ylab = 'Actual')
-plot(as.matrix(lmNE.AW), hittersNE$Salary, main = 'NE with AW, lm',
-     xlab = 'lm', ylab = 'Actual')
-plot(as.matrix(lmNE.NE), hittersNE$Salary, main = 'NE with NE, lm',
-     xlab = 'lm', ylab = 'Actual')
-plot(as.matrix(lmNE.NW), hittersNE$Salary, main = 'NE with NW, lm',
-     xlab = 'lm', ylab = 'Actual')
+plot(as.matrix(lmNEwAE), hittersNE$Salary, main = 'NE with AE, lm',
+     xlab = 'lm', ylab = 'Actual', col="blue")
+plot(as.matrix(lmNEwAW), hittersNE$Salary, main = 'NE with AW, lm',
+     xlab = 'lm', ylab = 'Actual', col="blue")
+plot(as.matrix(lmNEwNE), hittersNE$Salary, main = 'NE with NE, lm',
+     xlab = 'lm', ylab = 'Actual', col="blue")
+plot(as.matrix(lmNEwNW), hittersNE$Salary, main = 'NE with NW, lm',
+     xlab = 'lm', ylab = 'Actual', col="blue")
 
 # NW
 # lars
 plot(as.matrix(NW.AE), hittersNW$Salary, main = 'NW with AE, lars',
-     xlab = 'lars', ylab = 'Actual')
+     xlab = 'lars', ylab = 'Actual', col="red")
 plot(as.matrix(NW.AW), hittersNW$Salary, main = 'NW with AW, lars',
-     xlab = 'lars', ylab = 'Actual')
+     xlab = 'lars', ylab = 'Actual', col="red")
 plot(as.matrix(NW.NE), hittersNW$Salary, main = 'NW with NE, lars',
-     xlab = 'lars', ylab = 'Actual')
+     xlab = 'lars', ylab = 'Actual', col="red")
 plot(as.matrix(NW.NW), hittersNW$Salary, main = 'NW with NW, lars',
-     xlab = 'lars', ylab = 'Actual')
+     xlab = 'lars', ylab = 'Actual', col="red")
 
 # lm
-plot(as.matrix(lmNW.AE), hittersNW$Salary, main = 'NW with AE, lm',
-     xlab = 'lm', ylab = 'Actual')
-plot(as.matrix(lmNW.AW), hittersNW$Salary, main = 'NW with AW, lm',
-     xlab = 'lm', ylab = 'Actual')
-plot(as.matrix(lmNW.NE), hittersNW$Salary, main = 'NW with NE, lm',
-     xlab = 'lm', ylab = 'Actual')
-plot(as.matrix(lmNW.NW), hittersNW$Salary, main = 'NW with NW, lm',
-     xlab = 'lm', ylab = 'Actual')
+plot(as.matrix(lmNWwAE), hittersNW$Salary, main = 'NW with AE, lm',
+     xlab = 'lm', ylab = 'Actual', col="blue")
+plot(as.matrix(lmNWwAW), hittersNW$Salary, main = 'NW with AW, lm',
+     xlab = 'lm', ylab = 'Actual', col="blue")
+plot(as.matrix(lmNWwNE), hittersNW$Salary, main = 'NW with NE, lm',
+     xlab = 'lm', ylab = 'Actual', col="blue")
+plot(as.matrix(lmNWwNW), hittersNW$Salary, main = 'NW with NW, lm',
+     xlab = 'lm', ylab = 'Actual', col="blue")
+
