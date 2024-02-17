@@ -1,14 +1,15 @@
 ---
-title: "Assignment 01: Regression"
+title: 'Assignment 01: Regression'
 author: "Naman Shah"
 date: "`r Sys.Date()`"
-output: pdf_document
+output:
+  word_document: default
+  pdf_document: default
 ---
 
 ## Assignment 1 - Getting started with Regression
 
 Let's load the data and the libraries
-
 
 ```{r, results='hide', include=FALSE, echo=TRUE}
 library("tidyverse")
@@ -16,17 +17,21 @@ library("moderndive")
 library("skimr")
 source("regday1.pck")
 ```
+
 ```{r}
 regday1.pck
 ```
 
 Let's explore the data and the functions
 
-
 ```{r}
+# Displaying the first few rows of the data
 head(NOAAGISSWD)
+
+# Summary of the data in the dataframe
 summary(NOAAGISSWD)
 
+# Editing functions to include lambda to be 0.06
 gauss.reg1 <-
 function(x,y,lambda=0.06,xcol=4,do.plot=T)
 {
@@ -60,24 +65,24 @@ list(smat=smat,df=sum(diag(smat)),dferror=dferror,delta1=delta1,delta2=delta2,re
 
 ```
 
-We're setting lamda to 0.06 to work with temperature.
-For the first set of regression graphs, we will take x to be temperature and assign the y values to the following:
+We're setting lamda to 0.06 to work with temperature. For the first set of regression graphs, we will take x to be temperature and assign the y values to the following:
 
-* Drought Count
+-   Drought Count
 
-* Flooding Count
+-   Flooding Count
 
-* Severe Storm Count
+-   Severe Storm Count
 
-* Tropical Cyclone Count
+-   Tropical Cyclone Count
 
-* Wildfire Count
+-   Wildfire Count
 
-* Winter Storm Count
+-   Winter Storm Count
 
-* All Disasters Count
+-   All Disasters Count
 
-Let's start with **Drought Count** compared with **Delta Temperature**
+### Let's start with **Drought Count** compared with **Delta Temperature**
+
 ```{r}
 unique(NOAAGISSWD$Drought.Count)
 summary(NOAAGISSWD$delta.temp)
@@ -87,11 +92,11 @@ plot(NOAAGISSWD$delta.temp, NOAAGISSWD$Drought.Count, main="Correlation between 
 bootmatsmooth(NOAAGISSWD$delta.temp, NOAAGISSWD$Drought.Count)
 bootmatlin(NOAAGISSWD$delta.temp, NOAAGISSWD$Drought.Count)
 ```
-We notice that the unique values for drought count are only 0 and 1.
-This relationship is a non functional relationship, so a linear regression model is not recommended.
-For the bootmansmooth model, we don't see a bar come up, meaning the relationship between delta temperature and drought count is non functional.
 
-Next, **Flooding Count** compared with **Delta Temperature**
+We notice that the unique values for drought count are only 0 and 1. This relationship is a non functional relationship, so a linear regression model is not recommended. For the bootmansmooth model, we don't see a bar come up, meaning the relationship between delta temperature and drought count is non functional. As per the first graph, I would also say that the relationship is non functional.
+
+### Next, **Flooding Count** compared with **Delta Temperature**
+
 ```{r}
 unique(NOAAGISSWD$Flooding.Count)
 plot(NOAAGISSWD$delta.temp, NOAAGISSWD$Flooding.Count, main="Correlation between delta temperature and flood counts", xlab="Temperature", ylab="Flood Count", col="red")
@@ -99,9 +104,11 @@ plot(NOAAGISSWD$delta.temp, NOAAGISSWD$Flooding.Count, main="Correlation between
 bootmatsmooth(NOAAGISSWD$delta.temp, NOAAGISSWD$Flooding.Count)
 bootmatlin(NOAAGISSWD$delta.temp, NOAAGISSWD$Flooding.Count)
 ```
-The bar at bootmansmooth density graph leans towards the left, indicating the model might not be the best way to model a relationship between flood count and delta temperature.
 
-Next, **Severe Storm Count** compared with **Delta Temperature**
+The bar at bootmansmooth density graph leans towards the left, indicating the model might not be the best way to model a relationship between flood count and delta temperature. I would say that there seems to be slighlt linear relationship between delta temps 0.8 to 1.0, but overall the relationship seems to be non-linear. I would not recommend the bootmansmooth model despite indications that relationship might be functional, because there is simply a lot of disparity.
+
+### Next, **Severe Storm Count** compared with **Delta Temperature**
+
 ```{r}
 unique(NOAAGISSWD$Severe.Storm.Count)
 summary(NOAAGISSWD$Severe.Storm.Count)
@@ -111,21 +118,32 @@ plot(NOAAGISSWD$delta.temp, NOAAGISSWD$Severe.Storm.Count, main="Correlation bet
 bootmatsmooth(NOAAGISSWD$delta.temp, NOAAGISSWD$Severe.Storm.Count)
 bootmatlin(NOAAGISSWD$delta.temp, NOAAGISSWD$Severe.Storm.Count)
 ```
-The severe storm counts range from 0 to 19, with some outliers along the way. There is definitely an increase in severe storm counts with the rise in delta temperature.
-Again, the bar at bootmansmooth density graph leans towards the left, indicating the model might not be the best way to model a relationship between severe storm count and delta temperature.
-The bar plot does seem to indicate that the higher delta temperature is somewhat related to higher severe storm counts.
 
-Next, **Tropical Cyclone Count** compared with **Delta Temperature**
+The severe storm counts range from 0 to 19, with some outliers along the way. There is definitely an increase in severe storm counts with the rise in delta temperature. Again, the bar at bootmansmooth density graph leans towards the left, indicating the linear model might not be the best way to model a relationship between severe storm count and delta temperature. The bar plot does seem to indicate that the higher delta temperature is somewhat related to higher severe storm counts.
+
+I would say the relationship is functional, but not linear. It seems to be some sort of an exponential function, because with higher delta temperatures, the values of severe storm counts go up by huge increase.
+
+### Next, **Tropical Cyclone Count** compared with **Delta Temperature**
+
 ```{r}
 unique(NOAAGISSWD$Tropical.Cyclone.Count)
+summary(NOAAGISSWD$Tropical.Cyclone.Count)
+summary(NOAAGISSWD$delta.temp)
+
+NOAAGISSWD[NOAAGISSWD$Tropical.Cyclone.Count==7, ]
+
 plot(NOAAGISSWD$delta.temp, NOAAGISSWD$Tropical.Cyclone.Count, main="Correlation between delta temperature and tropical cyclone counts", xlab="Temperature", ylab="Tropical Cyclone Count", col="red")
 
 bootmatsmooth(NOAAGISSWD$delta.temp, NOAAGISSWD$Tropical.Cyclone.Count)
 bootmatlin(NOAAGISSWD$delta.temp, NOAAGISSWD$Tropical.Cyclone.Count)
 ```
-Once again, the bar at bootmansmooth density graph leans way towards the left, indicating the model might not be the best way to model a relationship between tropical cyclone count and delta temperature.
 
-Next, **Wildfire Count** compared with **Delta Temperature**
+Once again, the bar at bootmansmooth density graph leans way towards the left, indicating the linear model might not be the best way to model a relationship between tropical cyclone count and delta temperature.
+
+I would say this is a non functional relationship, simply because of the outliers and the inconsistencies in data for the increase in temeperature. At 1.07 delta temperature in 2020, there were 7 tropical cyclones, compared
+
+### Next, **Wildfire Count** compared with **Delta Temperature**
+
 ```{r}
 unique(NOAAGISSWD$Wildfire.Count)
 plot(NOAAGISSWD$delta.temp, NOAAGISSWD$Wildfire.Count, main="Correlation between delta temperature and wildfire counts", xlab="Temperature", ylab="Wildfire Count", col="red")
@@ -133,12 +151,13 @@ plot(NOAAGISSWD$delta.temp, NOAAGISSWD$Wildfire.Count, main="Correlation between
 bootmatsmooth(NOAAGISSWD$delta.temp, NOAAGISSWD$Wildfire.Count)
 bootmatlin(NOAAGISSWD$delta.temp, NOAAGISSWD$Wildfire.Count)
 ```
-We notice that Wildfire Counts can be represented as 0 and 1
-This itself proves to be not the best relationship to model as a functional relationship
-As indicated by the third graph on the density graph of the smooth model, the bar tends to be more to the left.
-This means this relationship isn't functional.
 
-Next, **Winter Storm Count** compared with **Delta Temperature**
+We notice that Wildfire Counts can be represented as 0 and 1 This itself proves to be not the best relationship to model as a functional relationship As indicated by the third graph on the density graph of the smooth model, the bar tends to be more to the left. This means this relationship isn't functional.
+
+With a function that can output 0 and 1, in a much random fashion, but we can see that with bigger delta temperature, the wildfire counts do tend to be 1.
+
+### Next, **Winter Storm Count** compared with **Delta Temperature**
+
 ```{r}
 unique(NOAAGISSWD$Winter.Storm.Count)
 plot(NOAAGISSWD$delta.temp, NOAAGISSWD$Winter.Storm.Count, main="Correlation between delta temperature and winter storm counts", xlab="Temperature", ylab="Winter Storm Count", col="red")
@@ -146,11 +165,13 @@ plot(NOAAGISSWD$delta.temp, NOAAGISSWD$Winter.Storm.Count, main="Correlation bet
 bootmatsmooth(NOAAGISSWD$delta.temp, NOAAGISSWD$Winter.Storm.Count)
 bootmatlin(NOAAGISSWD$delta.temp, NOAAGISSWD$Winter.Storm.Count)
 ```
-The data is evenly spread between 0 1 and 2 for delta temperature.
-Once again, the bar doesn't show up, telling us this isn't best way to represent a functional relationship.
-Linear regression would not be my advice for this model.
 
-Finally, **All Disasters Count** compared with **Delta Temperature**
+The data is evenly spread between 0 1 and 2 for delta temperature. Once again, the bar doesn't show up, telling us this isn't best way to represent a functional relationship. Linear regression would not be my advice for this model.
+
+The bar shows up around 0.0 for linear model, while the density lies between 0.3 to 0.9. So a linear relationship isn't recommended. Even for the smooth function, the data isn't functional, so a functional relationship is also not the best option.
+
+### Finally, **All Disasters Count** compared with **Delta Temperature**
+
 ```{r}
 summary(NOAAGISSWD$All.Disasters.Count)
 unique(NOAAGISSWD$All.Disasters.Count)
@@ -160,5 +181,5 @@ plot(NOAAGISSWD$delta.temp, NOAAGISSWD$All.Disasters.Count, main="Correlation be
 bootmatsmooth(NOAAGISSWD$delta.temp, NOAAGISSWD$All.Disasters.Count)
 bootmatlin(NOAAGISSWD$delta.temp, NOAAGISSWD$All.Disasters.Count)
 ```
-All disaster counts defintely shows something of a linear relationship with delta temperature. 
-Despite this, the density graphs tells us that the bar is leaning way towards the left, indicating that linear regression isn't the best way to do this.
+
+Personally, this would have been my best guess for a linear model. But unfortunately, as indicated by the density graphs, this isn't the best fit for a linear model. This however, is an increasing functional relationship, and my bet would be on an exponential model as the values seem to increase by a notch as the temperature grows.
