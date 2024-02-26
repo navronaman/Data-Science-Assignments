@@ -10,29 +10,29 @@ weather <- NOAAGISSWD
 #Assignment 3
 #drought
 
-wildDroughtLogit.year <- glm(Drought.Count~Year, family = binomial (link = logit),
+DroughtLogit.year <- glm(Drought.Count~Year, family = binomial (link = logit),
                           data = NOAAGISSWD)
-wildDroughtLogit.temp <- glm(Drought.Count~delta.temp, family = binomial (link = logit),
+DroughtLogit.temp <- glm(Drought.Count~delta.temp, family = binomial (link = logit),
                           data = NOAAGISSWD)
-wildDroughtLogit.yearAndtemp <- glm(Drought.Count~Year + delta.temp, family = binomial (link = logit),
+DroughtLogit.yearAndtemp <- glm(Drought.Count~Year + delta.temp, family = binomial (link = logit),
                                  data = NOAAGISSWD)
-wildDroughtLogit.yearWithtemp <- glm(Drought.Count~Year * delta.temp, family = binomial (link = logit),
+DroughtLogit.yearWithtemp <- glm(Drought.Count~Year * delta.temp, family = binomial (link = logit),
                                   data = NOAAGISSWD)
 
 #taking a look at variables in model 
-summary(wildDroughtLogit.year)
+summary(DroughtLogit.year)
 #AIC == 51.153
 #Null deviance: 53.413 on 43 degrees
 #Residual deviance: 47.153 on 42 degrees
-summary(wildDroughtLogit.temp)
+summary(DroughtLogit.temp)
 #AIC: 51.335
 #Null deviance: 53.413 on 43 degrees
 #Residual deviance: 47.335 on 42 degrees
-summary(wildDroughtLogit.yearAndtemp)
+summary(DroughtLogit.yearAndtemp)
 #AIC: 52.995
 #Null deviance: 53.413 on 43 degrees
 #Residual deviance: 46.995 on 41 degrees
-summary(wildFireLogit.yearWithtemp)
+summary(DroughtLogit.yearWithtemp)
 #AIC: 52.995
 #Null deviance: 53.413 o 43 degrees
 #Residual deviance: 46.995 on 42 degrees 
@@ -43,10 +43,10 @@ pred3 <- predict(wildDroughtLogit.yearAndtemp, NOAAGISSWD)
 pred4 <- predict(wildDroughtLogit.yearWithtemp, NOAAGISSWD)
 
 #plotting the predictions
-plot(pred1, NOAAGISSWD$Drought.Count, main = "Predictions vs. Actuals", xlab = "Predictions", ylab = "Actuals")
+plot(pred1, NOAAGISSWD$Drought.Count, main = "Predictions vs. Actuals (Temp)", xlab = "Predictions", ylab = "Actuals")
 
-plot(pred2, NOAAGISSWD$Drought.Count, main = "Predictions vs. Actuals", xlab = "Predictions", ylab = "Actuals")
+plot(pred2, NOAAGISSWD$Drought.Count, main = "Predictions vs. Actuals (Year)", xlab = "Predictions", ylab = "Actuals")
 
-plot(pred3, NOAAGISSWD$Drought.Count, main = "Predictions vs. Actuals", xlab = "Predictions", ylab = "Actuals")
+plot(pred3, NOAAGISSWD$Drought.Count, main = "Predictions vs. Actuals (Year+Temp)", xlab = "Predictions", ylab = "Actuals")
 
-plot(pred4, NOAAGISSWD$Drought.Count, main = "Predictions vs. Actuals", xlab = "Predictions", ylab = "Actuals")
+plot(pred4, NOAAGISSWD$Drought.Count, main = "Predictions vs. Actuals (Year*Temp)", xlab = "Predictions", ylab = "Actuals")
