@@ -1,0 +1,71 @@
+---
+title: "Assignment 3"
+author: "Naman Shah"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r, results='hide', include=FALSE, echo=TRUE}
+library('moderndive')
+library('tidyverse')
+library('skimr')
+source('fixregday1.pck')
+source("regday1.pck")
+```
+## Let's build the models
+
+```{r}
+DroughtLogit.year <- glm(Drought.Count~Year, family = binomial (link = logit),
+                          data = NOAAGISSWD)
+DroughtLogit.temp <- glm(Drought.Count~delta.temp, family = binomial (link = logit),
+                          data = NOAAGISSWD)
+DroughtLogit.yearAndtemp <- glm(Drought.Count~Year + delta.temp, family = binomial (link = logit),
+                                 data = NOAAGISSWD)
+DroughtLogit.yearWithtemp <- glm(Drought.Count~Year * delta.temp, family = binomial (link = logit),
+                                  data = NOAAGISSWD)
+
+```
+# Drought Compared to Year
+```{r}
+summary(DroughtLogit.year)
+```
+AIC: 51.153
+
+Null deviance: 53.413 on 43 degrees
+
+Residual deviance: 47.153 on 42 degrees
+
+# Drought Compared to Temperature
+```{r}
+summary(DroughtLogit.temp)
+```
+AIC: 51.335
+
+Null deviance: 53.413 on 43 degrees
+
+Residual deviance: 47.335 on 42 degrees
+
+# Drought Compared to Year+Temperature
+```{r}
+summary(DroughtLogit.yearAndtemp)
+```
+AIC: 52.995
+
+Null deviance: 53.413 on 43 degrees
+
+Residual deviance: 46.995 on 41 degrees
+
+# Drought Compared to Year*Temperature
+```{r}
+summary(DroughtLogit.yearWithtemp)
+```
+AIC: 54.529
+
+Null deviance: 53.413 on 43 degrees
+
+Residual deviance: 46.529 on 40 degrees 
+
+# Best Model for Drought
+As we can see, the best model according to the lowest AIC is Drought Compared to Year. 
+
+In the binomial functions using the logit link method, we see the AIC for the Drought Count compared to Year is 51.153, making it the most effective to predict Drought Count.
