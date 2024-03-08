@@ -1,0 +1,268 @@
+---
+title: 'Assignment 2B: Hitters data in ISLR with Random Forest'
+author: "Naman Shah"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+---
+
+# Loading the libraries, creating a color vector and setting a seed.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, results='hide', include=FALSE, echo=TRUE}
+library("ISLR")
+library("tidyverse")
+library('moderndive')
+library('skimr')
+library('lars')
+library('randomForest')
+```
+
+```{r}
+
+colors_vector <- c("#1f78b4", "#33a02c", "#e31a1c", "#ff7f00", "#6a3d9a",
+                   "#b15928", "#a6cee3", "#b2df8a", "#fb9a99", "#fdbf6f",
+                   "#cab2d6", "#ffff99", "#b15928", "#8dd3c7", "#bebada")
+
+
+set.seed(123)
+```
+
+# Establishing subsets for each division for model building purposes.
+
+```{r}
+hitters <- Hitters
+noNAHitter <- na.omit(hitters)
+hittersN <- noNAHitter[noNAHitter$League == 'N',]
+hittersA <- noNAHitter[noNAHitter$League == 'A',]
+hittersNE <- hittersN[hittersN$Division == 'E',]
+hittersNW <- hittersN[hittersN$Division == 'W',]
+hittersAE <- hittersA[hittersA$Division == 'E',]
+hittersAW <- hittersA[hittersA$Division == 'W',]
+
+boxplot(hittersNE$Salary, hittersNW$Salary, 
+        hittersAE$Salary, hittersAW$Salary,
+        col=colors_vector, main="Boxplot of salaries of different divisions")
+
+mainBoxLegend = c('NE Salary', 'NW Salary', 'AE Salary', 'AW Salary')
+legend('topright', legend = mainBoxLegend, fill = colors_vector, border = 'black', cex = 0.7)
+
+```
+
+The median of each division is effectively the same, though with the AE division having a slightly lower one. The interquartile range for all are also roughly the same, with the AW division having the highest upper quartile and NE having the lowest.
+
+# Building Lars models for all divisions
+```{r}
+#AE
+XAE <- hittersAE[, -c(20, 19, 14, 15)]
+YAE <- hittersAE$Salary
+larsAE <- lars(as.matrix(XAE), YAE)
+larsAE
+min(larsAE$Cp)
+larsAE$Cp == min(larsAE$Cp)
+#18, so adjusted index would be 19
+larsAE$beta[19,]
+larsAE$Cp[19]
+
+#AW
+XAW <- hittersAW[, -c(20, 19, 14, 15)]
+YAW <- hittersAW$Salary
+larsAW <- lars(as.matrix(XAW), YAW)
+larsAW
+min(larsAW$Cp)
+larsAW$Cp == min(larsAW$Cp)
+#4, so adjusted index would be 5
+larsAW$beta[5,]
+larsAW$Cp[5]
+
+#NE
+XNE <- hittersNE[, -c(20, 19, 14, 15)]
+YNE <- hittersNE$Salary
+larsNE <- lars(as.matrix(XNE), YNE)
+larsNE
+min(larsNE$Cp)
+larsNE$Cp == min(larsNE$Cp)
+#8, so adjusted index would be 9
+larsNE$beta[9,]
+larsNE$Cp[9]
+
+#NW
+XNW <- hittersNW[, -c(20, 19, 14, 15)] 
+YNW <- hittersNW$Salary
+larsNW <- lars(as.matrix(XNW), YNW)
+larsNW 
+min(larsNW$Cp)
+larsNW$Cp == min(larsNW$Cp)
+#16, so adjusted index would be 17
+larsNW$beta[17,]
+larsNW$Cp[17]
+
+
+
+```
+
+For the NE and NW models, it seems to the the walks, putouts, CRBI, Assists, HmRuns and years which play major roles.
+
+For reference, a scatterplot with red indicates LARs and a scatterplot with green indicates randomForest.
+```{r}
+#AE 
+plot(as.matrix(XAE)%*%larsAE$beta[19,] + larsAE$mu, YAE, main = "AE with AE, lars", col="red")
+cor(as.matrix(XAE)%*%larsAE$beta[19,] + larsAE$mu, YAE)
+cor(as.matrix(XAE)%*%larsAE$beta[19,] + larsAE$mu, YAE)^2
+
+#AW
+plot(as.matrix(XAW)%*%larsAW$beta[19,] + larsAW$mu, YAW, main = "AW with AW, lars", col="red")
+cor(as.matrix(XAW)%*%larsAW$beta[19,] + larsAW$mu, YAW)
+cor(as.matrix(XAW)%*%larsAW$beta[19,] + larsAW$mu, YAW)^2
+
+#NE
+plot(as.matrix(XNE)%*%larsNE$beta[19,] + larsNE$mu, YNE, main = "NE with NE, lars", col="red")
+cor(as.matrix(XNE)%*%larsNE$beta[19,] + larsNE$mu, YNE)
+cor(as.matrix(XNE)%*%larsNE$beta[19,] + larsNE$mu, YNE)^2
+
+#NW
+plot(as.matrix(XNW)%*%larsNW$beta[19,] + larsNW$mu, YNW, main = 'NW with NW, lars', col="red")
+cor(as.matrix(XNW)%*%larsNW$beta[19,] + larsNW$mu, YNW)
+cor(as.matrix(XNW)%*%larsNW$beta[19,] + larsNW$mu, YNW)^2
+```
+
+# Building NE and NW randomForest models
+```{r}
+# NE
+forestNEBase <- cbind(YNE, XNE)
+forestNE <- randomForest(YNE~., data=forestNEBase)
+
+# NW
+forestNWBase <- cbind(YNW, XNW)
+forestNW <- randomForest(YNW~., data=forestNWBase)
+```
+
+# Establishing lars models for NE and NW and adjusting for means
+```{r}
+#NE
+NE.AE <- as.matrix(XNE)%*%larsAE$beta[19,]
+NE.AW <- as.matrix(XNE)%*%larsAW$beta[5,]
+NE.NE <- as.matrix(XNE)%*%larsNE$beta[9,]
+NE.NW <- as.matrix(XNE)%*%larsNW$beta[17,]
+
+#NW
+NW.AE <- as.matrix(XNW)%*%larsAE$beta[19,]
+NW.AW <- as.matrix(XNW)%*%larsAW$beta[5,]
+NW.NE <- as.matrix(XNW)%*%larsNE$beta[9,]
+NW.NW <- as.matrix(XNW)%*%larsNW$beta[17,]
+
+```
+# Establishing randomForest models for NE and NW
+```{r}
+forestAE.NE <- predict(forestNE, XAE)
+forestAW.NE <- predict(forestNE, XAW)
+forestNE.NE <- predict(forestNE, XNE)
+forestNW.NE <- predict(forestNE, XNW)
+
+forestAE.NW <- predict(forestNW, XAE)
+forestAW.NW <- predict(forestNW, XAW)
+forestNE.NW <- predict(forestNW, XNE)
+forestNW.NW <- predict(forestNW, XNW)
+```
+
+
+# Plots with for NE lars models
+```{r}
+plot(as.matrix(NE.AE), hittersNE$Salary, main = 'NE with AE, lars',
+     xlab = 'lars', ylab = 'Actual', col="red")
+plot(as.matrix(NE.AW), hittersNE$Salary, main = 'NE with AW, lars',
+     xlab = 'lars', ylab = 'Actual', col="red")
+plot(as.matrix(NE.NE), hittersNE$Salary, main = 'NE with NE, lars',
+     xlab = 'lars', ylab = 'Actual', col="red")
+plot(as.matrix(NE.NW), hittersNE$Salary, main = 'NE with NW, lars',
+     xlab = 'lars', ylab = 'Actual', col="red")
+
+```
+
+[TEXT ABOUT NE LARS]
+
+# Plots for NW lars models
+```{r}
+plot(as.matrix(NW.AE), hittersNW$Salary, main = 'NW with AE, lars',
+     xlab = 'lars', ylab = 'Actual', col="red")
+plot(as.matrix(NW.AW), hittersNW$Salary, main = 'NW with AW, lars',
+     xlab = 'lars', ylab = 'Actual', col="red")
+plot(as.matrix(NW.NE), hittersNW$Salary, main = 'NW with NE, lars',
+     xlab = 'lars', ylab = 'Actual', col="red")
+plot(as.matrix(NW.NW), hittersNW$Salary, main = 'NW with NW, lars',
+     xlab = 'lars', ylab = 'Actual', col="red")
+
+```
+[
+Text about NE Lars
+]
+
+# Plots for NE randomForest models
+```{r}
+plot(as.matrix(forestAE.NE), hittersAE$Salary, main="AE with NE randomForest",
+     xlab="randomForest Salary", ylab="Actual Salary", col="darkgreen")
+
+plot(as.matrix(forestAW.NE), hittersAW$Salary, main="AW with NE randomForest",
+     xlab="randomForest Salary", ylab="Actual Salary", col="darkgreen")
+
+plot(as.matrix(forestNE.NE), hittersNE$Salary, main="NE with NE randomForest",
+     xlab="randomForest Salary", ylab="Actual Salary", col="darkgreen")
+
+plot(as.matrix(forestNW.NE), hittersNW$Salary, main="NW with NE randomForest",
+     xlab="randomForest Salary", ylab="Actual Salary", col="darkgreen")
+
+```
+Compared to the lars plots, all the relationships with the NE randomForest models show a functional relationship of some sorts with the salaries, this shows us that these do a much better job compared to the lars model at predicting salaries.
+
+# Plots for NW randomForest models
+```{r}
+plot(as.matrix(forestAE.NW), hittersAE$Salary, main="AE with NW randomForest",
+     xlab="randomForest Salary", ylab="Actual Salary", col="darkgreen")
+
+plot(as.matrix(forestAW.NW), hittersAW$Salary, main="AW with NW randomForest",
+     xlab="randomForest Salary", ylab="Actual Salary", col="darkgreen")
+
+plot(as.matrix(forestNE.NW), hittersNE$Salary, main="NE with NW randomForest",
+     xlab="randomForest Salary", ylab="Actual Salary", col="darkgreen")
+
+plot(as.matrix(forestNW.NW), hittersNW$Salary, main="NW with NW randomForest",
+     xlab="randomForest Salary", ylab="Actual Salary", col="darkgreen")
+```
+
+# Correlation between NE lars and NE randomForest models
+```{r}
+cor(AE.NE, hittersAE$Salary) 
+cor(forestAE.NE, hittersAE$Salary) 
+
+cor(AW.NE, hittersAW$Salary) 
+cor(forestAW.NE, hittersAW$Salary) 
+
+cor(NE.NE, hittersNE$Salary) 
+cor(forestNE.NE, hittersNE$Salary) 
+
+cor(NW.NE, hittersNW$Salary) 
+cor(forestNW.NE, hittersNW$Salary) 
+
+```
+The random forest model outperforms the lars model in almost all categories. Most importantly, for NE with NE category, the correlation for RF is 97% while for lars it is 68%, telling us that random forest should be out go-to model for linear predictions and functional relationships.
+
+# Correlation between NW lars and NW randomForest models
+```{r}
+cor(AE.NW, hittersAE$Salary) 
+cor(forestAE.NW, hittersAE$Salary) 
+
+cor(AW.NW, hittersAW$Salary) 
+cor(forestAW.NW, hittersAW$Salary) 
+
+cor(NE.NW, hittersNE$Salary) 
+cor(forestNE.NW, hittersNE$Salary) 
+
+cor(NW.NW, hittersNW$Salary) 
+cor(forestNW.NW, hittersNW$Salary) 
+
+```
+Once again, the rf models do way better than the lars model, with over 77% and above for each one, with a slight underperformance compared to the NE models, but the NW with NW is still at almost 95%. The lars model do an okay job, with a new low of 14% for predicting NE with NW base.
