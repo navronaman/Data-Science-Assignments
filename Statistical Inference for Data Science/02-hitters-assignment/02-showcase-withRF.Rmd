@@ -143,6 +143,18 @@ forestNW <- randomForest(YNW~., data=forestNWBase)
 
 # Establishing lars models for NE and NW and adjusting for means
 ```{r}
+#AE
+AE.AE <- as.matrix(XAE)%*%larsAE$beta[19,]
+AE.AW <- as.matrix(XAE)%*%larsAW$beta[5,]
+AE.NE <- as.matrix(XAE)%*%larsNE$beta[9,]
+AE.NW <- as.matrix(XAE)%*%larsNW$beta[17,]
+
+#AW
+AW.AE <- as.matrix(XAW)%*%larsAE$beta[19,]
+AW.AW <- as.matrix(XAW)%*%larsAW$beta[5,]
+AW.NE <- as.matrix(XAW)%*%larsNE$beta[9,]
+AW.NW <- as.matrix(XAW)%*%larsNW$beta[17,]
+
 #NE
 NE.AE <- as.matrix(XNE)%*%larsAE$beta[19,]
 NE.AW <- as.matrix(XNE)%*%larsAW$beta[5,]
@@ -183,7 +195,7 @@ plot(as.matrix(NE.NW), hittersNE$Salary, main = 'NE with NW, lars',
 
 ```
 
-[TEXT ABOUT NE LARS]
+I think the NE lars does fairly bad job at prediciting most salaries, espcially AE, AE and NW where it doesn't even seem to produce a functional relationship between the predictions and the actual salaries. During NE with NE, the graph also has some very significant outliers.
 
 # Plots for NW lars models
 ```{r}
@@ -197,9 +209,7 @@ plot(as.matrix(NW.NW), hittersNW$Salary, main = 'NW with NW, lars',
      xlab = 'lars', ylab = 'Actual', col="red")
 
 ```
-[
-Text about NE Lars
-]
+NW lars does a half-decent job at the predictions, shining partially when prediciting its own salaries. When used to predict other salaries, NWlars mostly does a terrible job, especially with AE. Let's have a look at NE randomForest models plotted against their original salaries.
 
 # Plots for NE randomForest models
 ```{r}
@@ -217,6 +227,7 @@ plot(as.matrix(forestNW.NE), hittersNW$Salary, main="NW with NE randomForest",
 
 ```
 Compared to the lars plots, all the relationships with the NE randomForest models show a functional relationship of some sorts with the salaries, this shows us that these do a much better job compared to the lars model at predicting salaries.
+Particularly, the NW with NW shows an almost perfect linear relationship.
 
 # Plots for NW randomForest models
 ```{r}
