@@ -1,0 +1,188 @@
+---
+title: 'Assignment 4'
+author: "Naman Shah"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+---
+
+# Loading the libraries
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library("ISLR")
+source("regboot.pck")
+source("fixregday1.pck")
+
+weather <- NOAAGISSWD
+default <- Default
+```
+# Running lmboot on Severe Storms
+## Severe Storms against Delta Temperature
+```{r}
+lmboot(Severe.Storm.Count~delta.temp, weather, 5000)
+
+```
+No zeroes for Severe Storms against Delta Temperature
+Press - 308.5
+Confidence - 95%
+## Severe Storms against Year
+
+```{r}
+lmboot(Severe.Storm.Count~Year, weather, 5000)
+```
+
+No zeroes for Severe Storms against Year
+Press - 278.5
+Confidence - 95%
+
+## Severe Storms against (Year + Temperature)
+
+```{r}
+lmboot(Severe.Storm.Count~I(Year + delta.temp), weather, 5000)
+```
+
+No zeroes for Severe Storms against (Year + Temperature)
+Press - 277.4
+Confidence - 95%
+
+## Severe Storms against (Year x Temperature)
+
+```{r}
+lmboot(Severe.Storm.Count~I(Year * delta.temp), weather, 5000)
+```
+
+No zeroes for Severe Storms against (Year x Temperature)
+Press - 304.3
+Confidence - 95%
+
+## Severe Storms against (Year^2)
+
+```{r}
+lmboot(Severe.Storm.Count~I(Year^2), weather, 5000)
+```
+
+No zeroes for Severe Storms against (Year^2)
+Press - 276.8
+Confidence - 95%
+
+## Severe Storms against (Temperature^2)
+
+```{r}
+lmboot(Severe.Storm.Count~I(delta.temp^2), weather, 5000)
+```
+
+No zeroes for Severe Storms against (Temperature^2)
+Press - 277.5
+Confidence - 95%
+
+## Severe Storms against (Year + Temperature + (Year*Temperature))
+
+```{r}
+lmboot(Severe.Storm.Count~I(Year + delta.temp + (Year*delta.temp)), weather, 5000)
+```
+
+No zeroes for Severe Storms against (Year + Temperature + (Year*Temperature))
+Press - 301.8
+Confidence - 95%
+
+## Severe Storms against (Year + Temperature + (Year^2) + (Temerature^2))
+
+```{r}
+lmboot(Severe.Storm.Count~I(Year + delta.temp + (Year^2) + (delta.temp^2)), weather, 5000)
+```
+
+No zeroes for Severe Storms against (Year + Temperature + (Year^2) + (Temerature^2))
+Press - 276.8
+Confidence - 95%
+
+## Severe Storms against (Year + Temperature + (Year*Temperature) + (Year^2) + (Temerature^2))
+
+```{r}
+lmboot(Severe.Storm.Count~I(Year + delta.temp + (delta.temp*Year) + (Year^2) + (delta.temp^2)), weather, 5000)
+```
+
+No zeroes for Severe Storms against (Year + Temperature + (Year*Temperature) + (Year^2) + (Temerature^2))
+Press - 276.2
+Confidence - 95%
+Sure, here's the modified R Markdown code with "Severe Storms" replaced with "All Disasters" and "Severe.Storm.Count" replaced with "All.Disaster.Count":
+
+#Running lmboot on All Disasters
+## All Disasters against Delta Temperature
+```{r}
+lmboot(All.Disasters.Count ~ delta.temp, weather, 5000)
+```
+No zeroes for All Disasters against Delta Temperature
+Press - 651.2
+Confidence - 95%
+
+## All Disasters against Year
+```{r}
+lmboot(All.Disasters.Count ~ Year, weather, 5000)
+```
+No zeroes for All Disasters against Year
+Press - 597.1
+Confidence - 95%
+
+## All Disasters against (Year + Temperature)
+```{r}
+lmboot(All.Disasters.Count ~ I(Year + delta.temp), weather, 5000)
+```
+No zeroes for All Disasters against (Year + Temperature)
+Press - 594.8
+Confidence - 95%
+
+## All Disasters against (Year x Temperature)
+```{r}
+lmboot(All.Disasters.Count ~ I(Year * delta.temp), weather, 5000)
+```
+No zeroes for All Disasters against (Year x Temperature)
+Press - 643.3
+Confidence - 95%
+
+## All Disasters against (Year^2)
+```{r}
+lmboot(All.Disasters.Count ~ I(Year^2), weather, 5000)
+```
+No zeroes for All Disasters against (Year^2)
+Press - 594.2
+Confidence - 95%
+
+## All Disasters against (Temperature^2)
+```{r}
+lmboot(All.Disasters.Count ~ I(delta.temp^2), weather, 5000)
+```
+No zeroes for All Disasters against (Temperature^2)
+Press - 492.6
+Confidence - 95%
+
+## All Disasters against (Year + Temperature + (Year*Temperature))
+```{r}
+lmboot(All.Disasters.Count ~ I(Year + delta.temp + (Year*delta.temp)), weather, 5000)
+```
+No zeroes for All Disasters against (Year + Temperature + (Year*Temperature))
+Press - 638.5
+Confidence - 95%
+
+## All Disasters against (Year + Temperature + (Year^2) + (Temerature^2))
+```{r}
+lmboot(All.Disasters.Count ~ I(Year + delta.temp + (Year^2) + (delta.temp^2)), weather, 5000)
+```
+No zeroes for All Disasters against (Year + Temperature + (Year^2) + (Temerature^2))
+Press - 594.2
+Confidence - 95%
+
+## All Disasters against (Year + Temperature + (Year*Temperature) + (Year^2) + (Temerature^2))
+```{r}
+lmboot(All.Disasters.Count ~ I(Year + delta.temp + (delta.temp*Year) + (Year^2) + (delta.temp^2)), weather, 5000)
+```
+No zeroes for All Disasters against (Year + Temperature + (Year*Temperature) + (Year^2) + (Temerature^2))
+Press - 592.9
+Confidence - 95%
+
+#Conclusions
+For both the counts, Severe Storm and All Disaster, any combination of Year and Temperature seems to do the job. In this case, the lowest press becomes the decider of the function.
