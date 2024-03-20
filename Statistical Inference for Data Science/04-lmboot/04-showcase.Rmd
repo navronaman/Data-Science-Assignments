@@ -22,6 +22,7 @@ weather <- NOAAGISSWD
 default <- Default
 ```
 # Running lmboot on Severe Storms
+
 ## Severe Storms against Delta Temperature
 ```{r}
 lmboot(Severe.Storm.Count~delta.temp, weather, 5000)
@@ -76,9 +77,23 @@ Confidence - 95%
 lmboot(Severe.Storm.Count~I(delta.temp^2), weather, 5000)
 ```
 
-No zeroes for Severe Storms against (Temperature^2)
+There is a zero for Severe Storms against (Temperature^2)
 Press - 277.5
 Confidence - 95%
+
+Let's try to add a one
+
+## Severe Storms against (Temperature^2)+1
+
+```{r}
+lmboot(Severe.Storm.Count~(I(delta.temp^2) + 1), weather)
+```
+
+There is still a zero for Severe Storms against (Temperature^2)+1
+Press - 277.5
+Confidence - 95%
+
+This is not a feasible model.
 
 ## Severe Storms against (Year + Temperature + (Year*Temperature))
 
@@ -90,28 +105,72 @@ No zeroes for Severe Storms against (Year + Temperature + (Year*Temperature))
 Press - 301.8
 Confidence - 95%
 
+
 ## Severe Storms against (Year + Temperature + (Year^2) + (Temerature^2))
 
 ```{r}
-lmboot(Severe.Storm.Count~I(Year + delta.temp + (Year^2) + (delta.temp^2)), weather, 5000)
+lmboot(Severe.Storm.Count~Year + delta.temp + I(Year^2) + I(delta.temp^2), weather, 5000)
 ```
 
-No zeroes for Severe Storms against (Year + Temperature + (Year^2) + (Temerature^2))
-Press - 276.8
+There are zeroes for Severe Storms against (Year + Temperature + (Year^2) + (Temerature^2))
+Press - 154.8
 Confidence - 95%
+
+Let's try removing a one.
+
+
+## Severe Storms against (Year + Temperature + (Year^2) + (Temerature^2)) - 1
+
+```{r}
+lmboot(Severe.Storm.Count~Year + delta.temp + I(Year^2) + I(delta.temp^2) - 1, weather, 5000)
+```
+
+No zeroes for Severe Storms against (Year + Temperature + (Year^2) + (Temerature^2)) - 1
+Press - 181.6
+Confidence - 95%
+
 
 ## Severe Storms against (Year + Temperature + (Year*Temperature) + (Year^2) + (Temerature^2))
 
 ```{r}
-lmboot(Severe.Storm.Count~I(Year + delta.temp + (delta.temp*Year) + (Year^2) + (delta.temp^2)), weather, 5000)
+lmboot(Severe.Storm.Count~Year + delta.temp + I(delta.temp*Year) + I(Year^2) + I(delta.temp^2), weather, 5000)
 ```
 
-No zeroes for Severe Storms against (Year + Temperature + (Year*Temperature) + (Year^2) + (Temerature^2))
-Press - 276.2
+There are zeroes for Severe Storms against (Year + Temperature + (Year*Temperature) + (Year^2) + (Temerature^2))
+Press - 143.6
 Confidence - 95%
-Sure, here's the modified R Markdown code with "Severe Storms" replaced with "All Disasters" and "Severe.Storm.Count" replaced with "All.Disaster.Count":
 
-#Running lmboot on All Disasters
+Let's try removing a one
+
+
+## Severe Storms against (Year + Temperature + (Year*Temperature) + (Year^2) + (Temperature^2)) - 1
+
+```{r}
+lmboot(Severe.Storm.Count~Year + delta.temp + I(delta.temp*Year) + I(Year^2) + I(delta.temp^2) - 1, weather, 5000)
+```
+
+There are still zeroes for Severe Storms against (Year + Temperature + (Year*Temperature) + (Year^2) + (Temerature^2))
+Press - 185.6
+Confidence - 95%
+
+Let's try adding a one
+
+
+## Severe Storms against (Year + Temperature + (Year*Temperature) + (Year^2) + (Temperature^2)) + 1
+
+```{r}
+lmboot(Severe.Storm.Count~Year + delta.temp + I(delta.temp*Year) + I(Year^2) + I(delta.temp^2) + 1, weather, 5000)
+```
+
+There are still some zeroes for Severe Storms against (Year + Temperature + (Year*Temperature) + (Year^2) + (Temperature^2)) + 1
+Press - 143.6
+Confidence - 95%
+
+These models are not feasible.
+
+
+# Running lmboot on All Disasters
+
 ## All Disasters against Delta Temperature
 ```{r}
 lmboot(All.Disasters.Count ~ delta.temp, weather, 5000)
@@ -185,4 +244,8 @@ Press - 592.9
 Confidence - 95%
 
 #Conclusions
-For both the counts, Severe Storm and All Disaster, any combination of Year and Temperature seems to do the job. In this case, the lowest press becomes the decider of the function.
+For both the counts, Severe Storm and All Disaster, any combination of Year and Temperature seems to do the job. None of the lmboots returned any zeroes. In this case, the lowest press becomes the decider of the function.
+For severe storms, the lowest press is 276.2 for Severe Storms against (Year + Temperature + (Year*Temperature) + (Year^2) + (Temperature^2))
+For all disasters, the lowest press is 492.6 for All Disasters against (Temperature^2).
+What is interesting about all disasters is that Temperature squared has a significantly lower values than other models, showing an increased effectiveness. On the other hand, a number of models for severe storms are in the 270-310 range.
+
