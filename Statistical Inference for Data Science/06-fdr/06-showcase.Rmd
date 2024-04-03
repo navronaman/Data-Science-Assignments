@@ -1,0 +1,234 @@
+---
+title: "Assignment 6: FDR"
+author: "Anthony Li and Naman Shah"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Setting up required packages
+
+```{r}
+source("regday3.pck")
+source("regday3.pck")
+source("fdr.pck")
+library("ISLR")
+library("infer")
+library("moderndive")
+```
+
+Let's have a look at the data.
+```{r}
+attributes(NCI60)
+summary(NCI60)
+unique(NCI60$labs)
+```
+
+Let's save the dataset as "cancer".
+```{r}
+cancer <- NCI60
+```
+
+# Work with CNS, Melanoma, Leukemia
+## FDR = 0.2
+Let's take an FDR of 0.2
+
+First let's subset the data into cns, mela, and leuk.
+```{r}
+cns <- NCI60$data[NCI60$labs == 'CNS',]
+mela <- NCI60$data[NCI60$labs == 'MELANOMA',]
+leuk <- NCI60$data[NCI60$labs == 'LEUKEMIA',]
+```
+Let's apply FDR.
+```{r}
+cnsData <- fdr(apply(cns, 2, myt), 0.2, ind = F)
+```
+
+No relevant data for CNS.
+Let's make melaData and leukData.
+```{r}
+melaData <- fdr(apply(mela, 2, myt), 0.2, ind = F)
+
+leukData <- fdr(apply(leuk, 2, myt), 0.2, ind = F)
+```
+
+
+Let's look at the interesting and make an interecstion.
+```{r}
+leukV <- leukData$interesting
+
+melaV <- melaData$interesting
+
+commonGene <- intersect(melaV, leukV)
+commonGene
+```
+
+The commonGene has nothing, meaning there are no genes in common.
+Let's try the same approach for a higher FDR, like 0.3.
+
+# FDR - 0.3
+```{r}
+cnsData <- fdr(apply(cns, 2, myt), 0.3, ind = F)
+
+melaData <- fdr(apply(mela, 2, myt), 0.3, ind = F)
+
+leukData <- fdr(apply(leuk, 2, myt), 0.3, ind = F)
+
+cnsV <- cnsData$interesting
+
+leukV <- leukData$interesting
+
+melaV <- melaData$interesting
+
+commonGene01 <- intersect(cnsV, melaV)
+print("Common genes between cns and mela.")
+commonGene01
+length(commonGene01)
+
+commonGene02 <- intersect(melaV, leukV)
+print("Common genes between mela and leuk")
+commonGene02
+length(commonGene02)
+
+commonGene03 <- intersect(leukV, cnsV)
+print("Common genes between leuk and cns")
+commonGene03
+length(commonGene03)
+
+commonGene1 <- intersect(commonGene01, commonGene02)
+print("Common genes between all the three datasets")
+commonGene1
+length(commonGene1)
+
+```
+
+The gene is 4289 is common between mela and leuk for the larger FDR value of 0.3
+
+
+# FDR - 0.4
+```{r}
+cnsData <- fdr(apply(cns, 2, myt), 0.4, ind = F)
+
+melaData <- fdr(apply(mela, 2, myt), 0.4, ind = F)
+
+leukData <- fdr(apply(leuk, 2, myt), 0.4, ind = F)
+
+cnsV <- cnsData$interesting
+
+leukV <- leukData$interesting
+
+melaV <- melaData$interesting
+
+commonGene01 <- intersect(cnsV, melaV)
+print("Common genes between cns and mela.")
+commonGene01
+length(commonGene01)
+
+commonGene02 <- intersect(melaV, leukV)
+print("Common genes between mela and leuk")
+commonGene02
+length(commonGene02)
+
+commonGene03 <- intersect(leukV, cnsV)
+print("Common genes between leuk and cns")
+commonGene03
+length(commonGene03)
+
+commonGene1 <- intersect(commonGene01, commonGene02)
+print("Common genes between all the three datasets")
+commonGene1
+length(commonGene1)
+
+
+```
+
+We again get 4289 between mela and leuk.
+
+
+# FDR - 0.45
+```{r}
+cnsData <- fdr(apply(cns, 2, myt), 0.45, ind = F)
+
+melaData <- fdr(apply(mela, 2, myt), 0.45, ind = F)
+
+leukData <- fdr(apply(leuk, 2, myt), 0.45, ind = F)
+
+cnsV <- cnsData$interesting
+
+leukV <- leukData$interesting
+
+melaV <- melaData$interesting
+
+commonGene01 <- intersect(cnsV, melaV)
+print("Common genes between cns and mela.")
+commonGene01
+length(commonGene01)
+
+commonGene02 <- intersect(melaV, leukV)
+print("Common genes between mela and leuk")
+commonGene02
+length(commonGene02)
+
+commonGene03 <- intersect(leukV, cnsV)
+print("Common genes between leuk and cns")
+commonGene03
+length(commonGene03)
+
+commonGene1 <- intersect(commonGene01, commonGene02)
+print("Common genes between all the three datasets")
+commonGene1
+length(commonGene1)
+
+```
+
+We get our largest intersection yet between mela and leuk, in six genes. We get 4289, 6369, 4287, 5887, 6080, and 5931 as  common genes  between the two diseases.
+Let's have our final try.
+
+# FDR - 0.5
+We cannot use any inference from an estimate for 50%, as that is highly likely to be random. This experiment is only for our academic purposes.
+```{r}
+cnsData <- fdr(apply(cns, 2, myt), 0.5, ind = F)
+
+melaData <- fdr(apply(mela, 2, myt), 0.5, ind = F)
+
+leukData <- fdr(apply(leuk, 2, myt), 0.5, ind = F)
+
+cnsV <- cnsData$interesting
+
+leukV <- leukData$interesting
+
+melaV <- melaData$interesting
+
+commonGene01 <- intersect(cnsV, melaV)
+print("Common genes between cns and mela.")
+commonGene01
+length(commonGene01)
+
+commonGene02 <- intersect(melaV, leukV)
+print("Common genes between mela and leuk")
+commonGene02
+length(commonGene02)
+
+commonGene03 <- intersect(leukV, cnsV)
+print("Common genes between leuk and cns")
+commonGene03
+length(commonGene03)
+
+commonGene1 <- intersect(commonGene01, commonGene02)
+print("Common genes between all the three datasets")
+commonGene1
+length(commonGene1)
+
+
+```
+We have 9 common genes between mela and leuk. We get 4288, 4289, 6369, 4287, 5887, 6080, 5931, 5356, and 6081, as common genes  between the two diseases.
+
+# Conclusions
+We tested our data on various percentages, 20%, 30%, 40% and 45%. While we did not get any common genes for 20%, we received 4289 as the only common gene in 30% and 40%. At a very high percentage like 45%, we recived 6 common genes, but due to the high percentage. We cannot determine much from it.
+It is important to note that this came from two cancers, melanoma and leukemia, and the gene 4289 might not be statistically independent for this particular gene.
+This tells us that the genes from the same cell might not be statistically independent. Mainly, we feel like the gene 4289 might be common in leukemia and melanoma. 
+
+
