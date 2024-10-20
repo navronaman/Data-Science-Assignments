@@ -1,0 +1,9 @@
+Treatment1,Treatment2,Weight
+Ex same,Eat Same,3
+Ex same,Eat Same,2
+Ex same,Eat Less,-1
+Ex same,Eat Less,1
+Ex more,Eat Same,1
+Ex more,Eat Same,2
+Ex more,Eat Less,-3
+Ex more,Eat Less,-2
